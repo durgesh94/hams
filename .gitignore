@@ -59,3 +59,6 @@ ui/*.njsproj
 ui/*.sln
 ui/*.sw?
 
+.DS_Store
+_notes/.DS_Store
+_notes/screenshots/.DS_Store
