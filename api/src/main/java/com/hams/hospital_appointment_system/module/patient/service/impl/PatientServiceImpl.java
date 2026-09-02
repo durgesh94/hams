@@ -1,5 +1,6 @@
 package com.hams.hospital_appointment_system.module.patient.service.impl;
 
+import com.hams.hospital_appointment_system.common.exception.DuplicateResourceException;
 import com.hams.hospital_appointment_system.module.patient.dto.PatientRequest;
 import com.hams.hospital_appointment_system.module.patient.dto.PatientResponse;
 import com.hams.hospital_appointment_system.module.patient.entity.Patient;
@@ -19,6 +20,9 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public PatientResponse createPatient(PatientRequest patientRequest) {
+        if(patientRepository.existsByEmail(patientRequest.getEmail())){
+            throw new DuplicateResourceException("Patient with email "+patientRequest.getEmail()+" already exists");
+        }
         Patient patient = PatientMapper.toEntity(patientRequest);
         Patient savedPatient = patientRepository.save(patient);
         return PatientMapper.toDto(savedPatient);
@@ -30,8 +34,13 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public List<PatientResponse> getAllPatient() {
-        return List.of();
+    public List<PatientResponse> getAllPatients() {
+        List<Patient> patientList = patientRepository.findAll();
+        return List.of(
+            patientList.stream()
+                    .map(PatientMapper::toDto)
+                    .toArray(PatientResponse[]::new)
+        );
     }
 
     @Override
