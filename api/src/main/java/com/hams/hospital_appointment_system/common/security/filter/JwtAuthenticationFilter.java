@@ -2,6 +2,7 @@ package com.hams.hospital_appointment_system.common.security.filter;
 
 import com.hams.hospital_appointment_system.common.security.service.CustomUserDetailsService;
 import com.hams.hospital_appointment_system.common.security.service.JwtService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,35 +34,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = null;
         String jwt = null;
 
-        if (authorizationHeader != null
-                && authorizationHeader.startsWith("Bearer ")) {
+        try{
 
-            jwt = authorizationHeader.substring(7);
+            if (authorizationHeader != null
+                    && authorizationHeader.startsWith("Bearer ")) {
 
-            username = jwtService.extractUsername(jwt);
-        }
+                jwt = authorizationHeader.substring(7);
 
-        if (username != null
-                && SecurityContextHolder.getContext().getAuthentication() == null) {
+                username = jwtService.extractUsername(jwt);
+            }
 
-            UserDetails userDetails =
-                    customUserDetailsService.loadUserByUsername(username);
+            if (username != null
+                    && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
+                UserDetails userDetails =
+                        customUserDetailsService.loadUserByUsername(username);
 
-            authentication.setDetails(
-                    new WebAuthenticationDetailsSource()
-                            .buildDetails(request)
-            );
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
 
-            SecurityContextHolder
-                    .getContext()
-                    .setAuthentication(authentication);
+                authentication.setDetails(
+                        new WebAuthenticationDetailsSource()
+                                .buildDetails(request)
+                );
+
+                SecurityContextHolder
+                        .getContext()
+                        .setAuthentication(authentication);
+            }
+        } catch (JwtException | IllegalArgumentException exception) {
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
 
         filterChain.doFilter(request, response);

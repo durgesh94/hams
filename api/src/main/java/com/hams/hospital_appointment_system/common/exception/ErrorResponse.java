@@ -1,15 +1,19 @@
 package com.hams.hospital_appointment_system.common.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ErrorResponse {
 
     private int status;
     private String message;
+    private Map<String, String> errors;
     private LocalDateTime timestamp;
 }

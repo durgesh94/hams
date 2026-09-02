@@ -12,4 +12,9 @@ public class UserController {
     public String getAllUsers(){
         return "allUsers";
     }
+
+    @GetMapping("/id")
+    public String getUserById(){
+        return "ID";
+    }
 }
