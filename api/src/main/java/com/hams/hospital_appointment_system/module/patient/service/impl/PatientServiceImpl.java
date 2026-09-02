@@ -1,6 +1,7 @@
 package com.hams.hospital_appointment_system.module.patient.service.impl;
 
 import com.hams.hospital_appointment_system.common.exception.DuplicateResourceException;
+import com.hams.hospital_appointment_system.common.exception.ResourceNotFoundException;
 import com.hams.hospital_appointment_system.module.patient.dto.PatientRequest;
 import com.hams.hospital_appointment_system.module.patient.dto.PatientResponse;
 import com.hams.hospital_appointment_system.module.patient.entity.Patient;
@@ -30,7 +31,9 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public PatientResponse getPatientById(Long id) {
-        return null;
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id " + id));
+        return PatientMapper.toDto(patient);
     }
 
     @Override
@@ -44,12 +47,19 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public List<PatientResponse> updatePatientById(Long id) {
-        return List.of();
+    public PatientResponse updatePatientById(Long id, PatientRequest patientRequest) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id " + id));
+        Patient updatedPatient = PatientMapper.updateEntity(patient, patientRequest);
+        Patient savedPatient = patientRepository.save(updatedPatient);
+        return PatientMapper.toDto(savedPatient);
     }
 
     @Override
     public PatientResponse deletePatientById(Long id) {
-        return null;
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id " + id));
+        patientRepository.delete(patient);
+        return PatientMapper.toDto(patient);
     }
 }

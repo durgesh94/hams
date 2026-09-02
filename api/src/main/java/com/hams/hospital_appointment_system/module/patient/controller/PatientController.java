@@ -45,4 +45,35 @@ public class PatientController {
                 .build();
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<PatientResponse>> getPatientById(@PathVariable Long id){
+        PatientResponse patientResponse = patientService.getPatientById(id);
+        ApiResponse<PatientResponse> response = ApiResponse.<PatientResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("Fetched patient with id " + id)
+                .data(patientResponse)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<PatientResponse>> updatePatientById(@PathVariable Long id, @Valid @RequestBody PatientRequest patientRequest) {
+        PatientResponse patientResponse = patientService.updatePatientById(id, patientRequest);
+        ApiResponse<PatientResponse> response = ApiResponse.<PatientResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("Updated patient with id " + id)
+                .data(patientResponse)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<PatientResponse>> deletePatientById(@PathVariable Long id) {
+        patientService.deletePatientById(id);
+        return ResponseEntity.noContent().build(); // No content is returned for delete operation
+        // Note: The response object is created but not returned because HTTP 204 No Content should not have a response body
+    }
 }

@@ -32,4 +32,14 @@ public class PatientMapper {
                 .phone(patient.getPhone())
                 .build();
     }
+
+    public static Patient updateEntity(Patient patient, PatientRequest patientRequest) {
+        patient.setFirstName(patientRequest.getFirstName());
+        patient.setLastName(patientRequest.getLastName());
+        patient.setGender(patientRequest.getGender());
+        patient.setDateOfBirth(patientRequest.getDateOfBirth());
+        patient.setEmail(patientRequest.getEmail());
+        patient.setPhone(patientRequest.getPhone());
+        return patient;
+    }
 }
