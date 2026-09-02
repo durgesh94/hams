@@ -1,5 +1,6 @@
 package com.hams.hospital_appointment_system.common.exception;
 
+import com.hams.hospital_appointment_system.common.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;

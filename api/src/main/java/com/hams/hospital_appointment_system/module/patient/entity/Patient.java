@@ -3,9 +3,15 @@ package com.hams.hospital_appointment_system.module.patient.entity;
 import java.time.LocalDate;
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "patients")
+@Builder
 public class Patient {
 
     @Id

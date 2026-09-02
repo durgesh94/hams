@@ -20,9 +20,10 @@ public class PatientController {
 
     @PostMapping
     public ResponseEntity<PatientResponse> createPatient(@Valid @RequestBody PatientRequest patientRequest) {
-        System.out.println("::::::::::::::::::" + patientRequest);
         PatientResponse patientResponse = patientService.createPatient(patientRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(patientResponse);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(patientResponse);
     }
 
     @GetMapping

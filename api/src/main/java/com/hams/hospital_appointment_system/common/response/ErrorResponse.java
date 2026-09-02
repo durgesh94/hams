@@ -1,4 +1,4 @@
-package com.hams.hospital_appointment_system.common.exception;
+package com.hams.hospital_appointment_system.common.response;
 
 import lombok.*;
 
