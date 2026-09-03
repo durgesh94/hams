@@ -22,7 +22,6 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message("An unexpected error occurred. Please try again later.")
-                .errors(null)
                 .timestamp(LocalDateTime.now())
                 .build();
 
@@ -87,7 +86,6 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
                 .message("Invalid request body. Please check the data you provided")
-                .errors(null)
                 .timestamp(LocalDateTime.now())
                 .build();
 

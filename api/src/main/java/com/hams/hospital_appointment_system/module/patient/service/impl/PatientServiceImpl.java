@@ -32,7 +32,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public PatientResponse getPatientById(Long id) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient with id '" + id + "' not found"));
         return PatientMapper.toDto(patient);
     }
 
@@ -49,7 +49,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public PatientResponse updatePatientById(Long id, PatientRequest patientRequest) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient with id '" + id + "' not found"));
         Patient updatedPatient = PatientMapper.updateEntity(patient, patientRequest);
         Patient savedPatient = patientRepository.save(updatedPatient);
         return PatientMapper.toDto(savedPatient);
@@ -58,7 +58,7 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public PatientResponse deletePatientById(Long id) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient with id '" + id + "' not found"));
         patientRepository.delete(patient);
         return PatientMapper.toDto(patient);
     }
