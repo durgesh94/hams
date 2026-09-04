@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: ${TEST_DB_URL:jdbc:postgresql://localhost:5432/hams_test_db}
+    username: ${TEST_DB_USERNAME:durgesh.tambe}
+    password: ${TEST_DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+
+  sql:
+    init:
+      mode: never
