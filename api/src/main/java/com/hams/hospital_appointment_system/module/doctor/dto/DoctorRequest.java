@@ -1,8 +1,12 @@
 package com.hams.hospital_appointment_system.module.doctor.dto;
 
 import com.hams.hospital_appointment_system.common.enums.Gender;
+import com.hams.hospital_appointment_system.module.doctor.entity.Status;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,10 +26,11 @@ public class DoctorRequest {
     @NotBlank(message = "Last name is required")
     private String lastName;
 
-    @NotBlank(message = "Gender is required")
+    @NotNull(message = "Gender is required")
     private Gender gender;
 
     @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
     private String email;
 
     @NotBlank(message = "Specialization is required")
@@ -34,12 +39,13 @@ public class DoctorRequest {
     @NotBlank(message = "Qualification is required")
     private String qualification;
 
-    @NotBlank(message = "Experience years is required")
-    private String experienceYears;
+    @NotNull(message = "Experience years is required")
+    private Integer experienceYears;
 
     @NotBlank(message = "Phone is required")
+    @Pattern(regexp = "\\d{10}", message = "Phone number should be 10 digits")
     private String phone;
-    
-    @NotBlank(message = "Status is required")
-    private String status;
+
+    @NotNull(message = "Status is required")
+    private Status status;
 }
