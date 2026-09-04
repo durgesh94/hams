@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import com.hams.hospital_appointment_system.module.patient.entity.Gender;
+import com.hams.hospital_appointment_system.common.enums.Gender;
 import jakarta.validation.constraints.*;
 import lombok.*;
 

@@ -2,6 +2,7 @@ package com.hams.hospital_appointment_system.module.patient.entity;
 
 import java.time.LocalDate;
 
+import com.hams.hospital_appointment_system.common.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 

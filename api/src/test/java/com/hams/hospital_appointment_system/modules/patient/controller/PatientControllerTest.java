@@ -6,7 +6,7 @@ import com.hams.hospital_appointment_system.common.security.service.JwtService;
 import com.hams.hospital_appointment_system.module.patient.controller.PatientController;
 import com.hams.hospital_appointment_system.module.patient.dto.PatientRequest;
 import com.hams.hospital_appointment_system.module.patient.dto.PatientResponse;
-import com.hams.hospital_appointment_system.module.patient.entity.Gender;
+import com.hams.hospital_appointment_system.common.enums.Gender;
 import com.hams.hospital_appointment_system.module.patient.service.PatientService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

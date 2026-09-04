@@ -2,7 +2,7 @@ package com.hams.hospital_appointment_system.module.patient.dto;
 
 import java.time.LocalDate;
 
-import com.hams.hospital_appointment_system.module.patient.entity.Gender;
+import com.hams.hospital_appointment_system.common.enums.Gender;
 import lombok.*;
 
 @Getter

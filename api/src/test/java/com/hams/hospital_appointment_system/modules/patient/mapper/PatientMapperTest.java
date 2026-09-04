@@ -2,7 +2,7 @@ package com.hams.hospital_appointment_system.modules.patient.mapper;
 
 import com.hams.hospital_appointment_system.module.patient.dto.PatientRequest;
 import com.hams.hospital_appointment_system.module.patient.dto.PatientResponse;
-import com.hams.hospital_appointment_system.module.patient.entity.Gender;
+import com.hams.hospital_appointment_system.common.enums.Gender;
 import com.hams.hospital_appointment_system.module.patient.entity.Patient;
 import com.hams.hospital_appointment_system.module.patient.mapper.PatientMapper;
 import org.junit.jupiter.api.Test;

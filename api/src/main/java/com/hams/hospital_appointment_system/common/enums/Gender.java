@@ -1,4 +1,4 @@
-package com.hams.hospital_appointment_system.module.patient.entity;
+package com.hams.hospital_appointment_system.common.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
