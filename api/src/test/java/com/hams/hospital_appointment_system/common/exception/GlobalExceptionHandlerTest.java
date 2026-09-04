@@ -1,4 +1,4 @@
-package com.hams.hospital_appointment_system.modules.exception;
+package com.hams.hospital_appointment_system.common.exception;
 
 import com.hams.hospital_appointment_system.common.exception.DuplicateResourceException;
 import com.hams.hospital_appointment_system.common.exception.GlobalExceptionHandler;
