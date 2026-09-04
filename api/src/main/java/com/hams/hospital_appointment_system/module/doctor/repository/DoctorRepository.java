@@ -1,9 +1,13 @@
 package com.hams.hospital_appointment_system.module.doctor.repository;
+
 import com.hams.hospital_appointment_system.module.doctor.entity.Doctor;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface DoctorRepository extends JpaRepository<Doctor, Long> {
+public interface DoctorRepository extends
+        JpaRepository<Doctor, Long>,
+        JpaSpecificationExecutor<Doctor> {
 
     boolean existsByEmail(String email);
-    
+
 }

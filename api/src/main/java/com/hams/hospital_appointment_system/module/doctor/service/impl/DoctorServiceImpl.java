@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorRequest;
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorResponse;
+import com.hams.hospital_appointment_system.module.doctor.dto.DoctorFilterRequest;
+import com.hams.hospital_appointment_system.module.doctor.specification.DoctorSpecification;
 import java.util.List;
 import com.hams.hospital_appointment_system.module.doctor.entity.Doctor;
 import com.hams.hospital_appointment_system.module.doctor.mapper.DoctorMapper;
@@ -61,5 +63,13 @@ public class DoctorServiceImpl implements DoctorService {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id " + doctorId));
         doctorRepository.delete(doctor);
+    }
+
+    @Override
+    public List<DoctorResponse> getDoctorsByFilter(DoctorFilterRequest filterRequest) {
+        List<Doctor> doctors = doctorRepository.findAll(DoctorSpecification.byFilter(filterRequest));
+        return doctors.stream()
+                .map(DoctorMapper::toDto)
+                .toList();
     }
 }
