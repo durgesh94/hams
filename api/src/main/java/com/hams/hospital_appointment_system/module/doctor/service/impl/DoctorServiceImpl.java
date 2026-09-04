@@ -2,6 +2,8 @@ package com.hams.hospital_appointment_system.module.doctor.service.impl;
 
 import com.hams.hospital_appointment_system.module.doctor.service.DoctorService;
 import com.hams.hospital_appointment_system.common.exception.DuplicateResourceException;
+import com.hams.hospital_appointment_system.common.exception.ResourceNotFoundException;
+
 import lombok.RequiredArgsConstructor;
 
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorRequest;
@@ -33,7 +35,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public DoctorResponse getDoctorById(Long doctorId) {
         Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new RuntimeException("Doctor not found with id " + doctorId));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id " + doctorId));
         return DoctorMapper.toDto(doctor);
     }
 
@@ -48,7 +50,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public DoctorResponse updateDoctor(Long doctorId, DoctorRequest doctorRequest) {
         Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new RuntimeException("Doctor not found with id " + doctorId));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id " + doctorId));
         doctor = DoctorMapper.updateEntity(doctor, doctorRequest);
         doctor = doctorRepository.save(doctor);
         return DoctorMapper.toDto(doctor);
@@ -57,7 +59,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public void deleteDoctor(Long doctorId) {
         Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new RuntimeException("Doctor not found with id " + doctorId));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id " + doctorId));
         doctorRepository.delete(doctor);
     }
 }

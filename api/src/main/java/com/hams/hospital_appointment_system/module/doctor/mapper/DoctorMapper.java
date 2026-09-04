@@ -18,6 +18,7 @@ public class DoctorMapper {
                 .gender(doctorRequest.getGender())
                 .qualification(doctorRequest.getQualification())
                 .specialization(doctorRequest.getSpecialization())
+                .experienceYears(doctorRequest.getExperienceYears())
                 .email(doctorRequest.getEmail())
                 .phone(doctorRequest.getPhone())
                 .status(doctorRequest.getStatus())
@@ -27,11 +28,13 @@ public class DoctorMapper {
     public static DoctorResponse toDto(Doctor doctor) {
         return DoctorResponse.builder()
                 // Map fields from Doctor entity to DoctorResponse
+                .id(doctor.getId())
                 .firstName(doctor.getFirstName())
                 .lastName(doctor.getLastName())
                 .gender(doctor.getGender().name())
                 .qualification(doctor.getQualification())
                 .specialization(doctor.getSpecialization())
+                .experienceYears(doctor.getExperienceYears())
                 .email(doctor.getEmail())
                 .phone(doctor.getPhone())
                 .status(doctor.getStatus().name())
@@ -44,6 +47,7 @@ public class DoctorMapper {
         doctor.setGender(doctorRequest.getGender());
         doctor.setQualification(doctorRequest.getQualification());
         doctor.setSpecialization(doctorRequest.getSpecialization());
+        doctor.setExperienceYears(doctorRequest.getExperienceYears());
         doctor.setEmail(doctorRequest.getEmail());
         doctor.setPhone(doctorRequest.getPhone());
         doctor.setStatus(doctorRequest.getStatus());

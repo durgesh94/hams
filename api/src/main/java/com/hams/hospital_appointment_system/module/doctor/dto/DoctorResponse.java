@@ -19,7 +19,7 @@ public class DoctorResponse {
     private String email;
     private String specialization;
     private String qualification;
-    private String experienceYears;
+    private Integer experienceYears;
     private String phone;
     private String status;
 }
