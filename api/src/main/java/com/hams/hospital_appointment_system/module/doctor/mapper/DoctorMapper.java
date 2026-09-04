@@ -37,4 +37,16 @@ public class DoctorMapper {
                 .status(doctor.getStatus().name())
                 .build();
     }
+
+    public static Doctor updateEntity(Doctor doctor, DoctorRequest doctorRequest) {
+        doctor.setFirstName(doctorRequest.getFirstName());
+        doctor.setLastName(doctorRequest.getLastName());
+        doctor.setGender(doctorRequest.getGender());
+        doctor.setQualification(doctorRequest.getQualification());
+        doctor.setSpecialization(doctorRequest.getSpecialization());
+        doctor.setEmail(doctorRequest.getEmail());
+        doctor.setPhone(doctorRequest.getPhone());
+        doctor.setStatus(doctorRequest.getStatus());
+        return doctor;
+    }
 }
