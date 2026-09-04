@@ -94,7 +94,7 @@ public class DoctorController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/search")
+    @GetMapping("/filter")
     public ResponseEntity<ApiResponse<List<DoctorResponse>>> getByFilter(
             @ModelAttribute DoctorFilterRequest filterRequest) {
         List<DoctorResponse> doctors = doctorService.getDoctorsByFilter(filterRequest);
