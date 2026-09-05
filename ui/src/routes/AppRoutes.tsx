@@ -7,7 +7,7 @@ import {
 import Dashboard from "../pages/Dashboard";
 import Login from "../pages/Login";
 import AppLayout from "../components/layout/AppLayout";
-import Appointment from "../pages/Appointment";
+import Appointments from "../pages/Appointment";
 import Doctor from "../pages/Doctor";
 import Patient from "../pages/Patient";
 
@@ -23,7 +23,7 @@ const AppRoutes = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/doctors" element={<Doctor />} />
           <Route path="/patients" element={<Patient />} />
-          <Route path="/appointments" element={<Appointment />} />
+          <Route path="/appointments" element={<Appointments />} />
         </Route>
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

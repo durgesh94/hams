@@ -20,9 +20,21 @@ const theme = createTheme({
     success: {
       main: "#388E3C",
     },
+    background: {
+      default: "#F5F9FC",
+      paper: "#FFFFFF",
+    },
+
+    text: {
+      primary: "#263238",
+      secondary: "#546E7A",
+    },
   },
   typography: {
     fontFamily: "Roboto, Arial, sans-serif",
+  },
+  shape: {
+    borderRadius: 8,
   },
 });
 

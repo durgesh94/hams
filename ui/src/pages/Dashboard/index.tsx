@@ -3,10 +3,6 @@ import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
 const Dashboard = () => {
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 3 }}>
-        Dashboard
-      </Typography>
-
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 4 }}>
           <Card>
