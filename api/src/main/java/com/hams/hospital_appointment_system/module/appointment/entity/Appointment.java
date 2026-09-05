@@ -51,10 +51,10 @@ public class Appointment {
     @Column(name = "appointment_time", nullable = false)
     private LocalTime appointmentTime;
 
-    @Column(length = 500)
+    @Column(nullable = true, length = 500)
     private String reason;
 
-    @Column(length = 1000)
+    @Column(nullable = true, length = 1000)
     private String notes;
 
     @Enumerated(EnumType.STRING)

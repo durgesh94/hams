@@ -93,4 +93,17 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(errorResponse);
     }
+
+    @ExceptionHandler(AppointmentSlotAlreadyBookedException.class)
+    public ResponseEntity<ErrorResponse> handleAppointmentSlotAlreadyBookedException(AppointmentSlotAlreadyBookedException exception) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .message(exception.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(errorResponse);
+    }
 }
