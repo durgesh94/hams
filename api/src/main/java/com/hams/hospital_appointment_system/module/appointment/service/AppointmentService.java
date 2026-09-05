@@ -6,5 +6,7 @@ import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentRe
 public interface AppointmentService {
 
     AppointmentResponse createAppointment(AppointmentRequest request);
+
+    AppointmentResponse getAppointmentById(Long appointmentId);
     
 }

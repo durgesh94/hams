@@ -1,5 +1,6 @@
 package com.hams.hospital_appointment_system.module.appointment.controller;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,18 @@ public class AppointmentController {
                 .timestamp(LocalDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<AppointmentResponse>> getAppointmentById(@PathVariable("id") Long appointmentId) {
+        AppointmentResponse response = appointmentService.getAppointmentById(appointmentId);
+        ApiResponse<AppointmentResponse> apiResponse = ApiResponse.<AppointmentResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("Appointment retrieved successfully")
+                .data(response)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
 }

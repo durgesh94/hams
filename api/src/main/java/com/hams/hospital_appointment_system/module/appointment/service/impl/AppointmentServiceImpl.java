@@ -65,4 +65,11 @@ public class AppointmentServiceImpl implements AppointmentService {
         return AppointmentMapper.toDto(appointment);
     }
 
+    @Override
+    public AppointmentResponse getAppointmentById(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id " + appointmentId));
+        return AppointmentMapper.toDto(appointment);
+    }
+
 }
