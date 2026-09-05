@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,8 +20,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import lombok.RequiredArgsConstructor;
 
 import com.hams.hospital_appointment_system.common.response.ApiResponse;
+import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentFilter;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentRequest;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentResponse;
+import com.hams.hospital_appointment_system.module.appointment.entity.AppointmentStatus;
 import com.hams.hospital_appointment_system.module.appointment.service.AppointmentService;
 
 @RestController
@@ -69,11 +73,24 @@ public class AppointmentController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApiResponse<AppointmentResponse>> updateAppointmentStatus(
             @PathVariable("id") Long appointmentId,
-            @RequestParam("status") String status) {
+            @RequestParam("status") AppointmentStatus status) {
         AppointmentResponse response = appointmentService.updateAppointmentStatus(appointmentId, status);
         ApiResponse<AppointmentResponse> apiResponse = ApiResponse.<AppointmentResponse>builder()
                 .status(HttpStatus.OK.value())
                 .message("Appointment status updated successfully")
+                .data(response)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<ApiResponse<List<AppointmentResponse>>> getAppointments(
+            @ModelAttribute AppointmentFilter filter) {
+        List<AppointmentResponse> response = appointmentService.getAppointments(filter);
+        ApiResponse<List<AppointmentResponse>> apiResponse = ApiResponse.<List<AppointmentResponse>>builder()
+                .status(HttpStatus.OK.value())
+                .message("Appointments retrieved successfully")
                 .data(response)
                 .timestamp(LocalDateTime.now())
                 .build();

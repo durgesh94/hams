@@ -2,6 +2,7 @@ package com.hams.hospital_appointment_system.module.appointment.service.impl;
 
 import com.hams.hospital_appointment_system.common.exception.AppointmentSlotAlreadyBookedException;
 import com.hams.hospital_appointment_system.common.exception.ResourceNotFoundException;
+import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentFilter;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentRequest;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentResponse;
 import com.hams.hospital_appointment_system.module.appointment.entity.Appointment;
@@ -9,6 +10,7 @@ import com.hams.hospital_appointment_system.module.appointment.entity.Appointmen
 import com.hams.hospital_appointment_system.module.appointment.mapper.AppointmentMapper;
 import com.hams.hospital_appointment_system.module.appointment.repository.AppointmentRepository;
 import com.hams.hospital_appointment_system.module.appointment.service.AppointmentService;
+import com.hams.hospital_appointment_system.module.appointment.specification.AppointmentSpecification;
 import com.hams.hospital_appointment_system.module.doctor.entity.Doctor;
 import com.hams.hospital_appointment_system.module.doctor.entity.DoctorStatus;
 import com.hams.hospital_appointment_system.module.doctor.repository.DoctorRepository;
@@ -96,14 +98,22 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public AppointmentResponse updateAppointmentStatus(Long appointmentId, String status) {
+    public AppointmentResponse updateAppointmentStatus(Long appointmentId, AppointmentStatus status) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id " + appointmentId));
 
-        appointment.setStatus(AppointmentStatus.valueOf(status));
+        appointment.setStatus(status);
         appointment.setUpdatedAt(LocalDateTime.now());
 
         appointment = appointmentRepository.save(appointment);
         return AppointmentMapper.toDto(appointment);
+    }
+
+    @Override
+    public List<AppointmentResponse> getAppointments(AppointmentFilter filter) {
+        return appointmentRepository.findAll(AppointmentSpecification.filter(filter))
+                .stream()
+                .map(AppointmentMapper::toDto)
+                .toList();
     }
 }
