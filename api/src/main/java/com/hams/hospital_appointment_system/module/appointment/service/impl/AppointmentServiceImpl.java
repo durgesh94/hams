@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -72,4 +73,37 @@ public class AppointmentServiceImpl implements AppointmentService {
         return AppointmentMapper.toDto(appointment);
     }
 
+    @Override
+    public AppointmentResponse updateAppointment(Long appointmentId, AppointmentRequest request) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id " + appointmentId));
+        Doctor doctor = doctorRepository.findById(request.getDoctorId())
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id " + request.getDoctorId()));
+        Patient patient = patientRepository.findById(request.getPatientId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Patient not found with id " + request.getPatientId()));
+
+        appointment.setDoctor(doctor);
+        appointment.setPatient(patient);
+        appointment.setAppointmentDate(request.getAppointmentDate());
+        appointment.setAppointmentTime(request.getAppointmentTime());
+        appointment.setReason(request.getReason());
+        appointment.setNotes(request.getNotes());
+        appointment.setUpdatedAt(LocalDateTime.now());
+
+        appointment = appointmentRepository.save(appointment);
+        return AppointmentMapper.toDto(appointment);
+    }
+
+    @Override
+    public AppointmentResponse updateAppointmentStatus(Long appointmentId, String status) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id " + appointmentId));
+
+        appointment.setStatus(AppointmentStatus.valueOf(status));
+        appointment.setUpdatedAt(LocalDateTime.now());
+
+        appointment = appointmentRepository.save(appointment);
+        return AppointmentMapper.toDto(appointment);
+    }
 }

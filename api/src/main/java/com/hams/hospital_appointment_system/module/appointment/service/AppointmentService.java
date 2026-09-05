@@ -8,5 +8,9 @@ public interface AppointmentService {
     AppointmentResponse createAppointment(AppointmentRequest request);
 
     AppointmentResponse getAppointmentById(Long appointmentId);
+
+    AppointmentResponse updateAppointment(Long appointmentId, AppointmentRequest request);
+
+    AppointmentResponse updateAppointmentStatus(Long appointmentId, String status);
     
 }

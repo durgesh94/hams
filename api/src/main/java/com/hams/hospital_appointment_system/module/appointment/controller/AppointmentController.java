@@ -3,6 +3,7 @@ package com.hams.hospital_appointment_system.module.appointment.controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,9 @@ import java.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,6 +47,33 @@ public class AppointmentController {
         ApiResponse<AppointmentResponse> apiResponse = ApiResponse.<AppointmentResponse>builder()
                 .status(HttpStatus.OK.value())
                 .message("Appointment retrieved successfully")
+                .data(response)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<AppointmentResponse>> updateAppointment(@PathVariable("id") Long appointmentId,
+            @RequestBody AppointmentRequest request) {
+        AppointmentResponse response = appointmentService.updateAppointment(appointmentId, request);
+        ApiResponse<AppointmentResponse> apiResponse = ApiResponse.<AppointmentResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("Appointment updated successfully")
+                .data(response)
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<AppointmentResponse>> updateAppointmentStatus(
+            @PathVariable("id") Long appointmentId,
+            @RequestParam("status") String status) {
+        AppointmentResponse response = appointmentService.updateAppointmentStatus(appointmentId, status);
+        ApiResponse<AppointmentResponse> apiResponse = ApiResponse.<AppointmentResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("Appointment status updated successfully")
                 .data(response)
                 .timestamp(LocalDateTime.now())
                 .build();
