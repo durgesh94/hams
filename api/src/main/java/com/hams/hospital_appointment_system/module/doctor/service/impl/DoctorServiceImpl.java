@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorRequest;
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorResponse;
+import com.hams.hospital_appointment_system.module.appointment.repository.AppointmentRepository;
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorFilterRequest;
 import com.hams.hospital_appointment_system.module.doctor.specification.DoctorSpecification;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 public class DoctorServiceImpl implements DoctorService {
 
     private final DoctorRepository doctorRepository;
+    private final AppointmentRepository appointmentRepository;
 
     @Override
     public DoctorResponse createDoctor(DoctorRequest doctorRequest) {
@@ -38,14 +40,22 @@ public class DoctorServiceImpl implements DoctorService {
     public DoctorResponse getDoctorById(Long doctorId) {
         Doctor doctor = doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with id " + doctorId));
-        return DoctorMapper.toDto(doctor);
+        long appointmentCount = appointmentRepository.countByDoctorId(doctor.getId());
+        DoctorResponse doctorResponse = DoctorMapper.toDto(doctor);
+        doctorResponse.setAppointmentCount(appointmentCount);
+        return doctorResponse;
     }
 
     @Override
     public List<DoctorResponse> getAllDoctors() {
         List<Doctor> doctors = doctorRepository.findAll();
         return doctors.stream()
-                .map(DoctorMapper::toDto)
+                .map(doctor -> {
+                    DoctorResponse doctorResponse = DoctorMapper.toDto(doctor);
+                    long appointmentCount = appointmentRepository.countByDoctorId(doctor.getId());
+                    doctorResponse.setAppointmentCount(appointmentCount);
+                    return doctorResponse;
+                })
                 .toList();
     }
 

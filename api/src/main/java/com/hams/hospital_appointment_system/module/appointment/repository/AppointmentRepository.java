@@ -36,4 +36,6 @@ public interface AppointmentRepository extends
             LocalDate appointmentDate,
             LocalTime appointmentTime,
             AppointmentStatus status);
+    
+    long countByDoctorId(Long doctorId);
 }

@@ -22,4 +22,5 @@ public class DoctorResponse {
     private Integer experienceYears;
     private String phone;
     private String status;
+    private Long appointmentCount;
 }
