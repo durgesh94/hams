@@ -4,7 +4,7 @@ import com.hams.hospital_appointment_system.common.enums.Gender;
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorRequest;
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorResponse;
 import com.hams.hospital_appointment_system.module.doctor.entity.Doctor;
-import com.hams.hospital_appointment_system.module.doctor.entity.Status;
+import com.hams.hospital_appointment_system.module.doctor.entity.DoctorStatus;
 import com.hams.hospital_appointment_system.module.doctor.mapper.DoctorMapper;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,7 @@ class DoctorMapperTest {
                                 .qualification("MBBS, MD")
                                 .experienceYears(10)
                                 .phone("9876543210")
-                                .status(Status.ACTIVE)
+                                .status(DoctorStatus.ACTIVE)
                                 .build();
 
                 Doctor doctor = DoctorMapper.toEntity(request);
@@ -38,7 +38,7 @@ class DoctorMapperTest {
                 assertThat(doctor.getQualification()).isEqualTo("MBBS, MD");
                 assertThat(doctor.getExperienceYears()).isEqualTo(10);
                 assertThat(doctor.getPhone()).isEqualTo("9876543210");
-                assertThat(doctor.getStatus()).isEqualTo(Status.ACTIVE);
+                assertThat(doctor.getStatus()).isEqualTo(DoctorStatus.ACTIVE);
         }
 
         @Test
@@ -54,7 +54,7 @@ class DoctorMapperTest {
                                 .qualification("MBBS, DM")
                                 .experienceYears(8)
                                 .phone("9876543211")
-                                .status(Status.INACTIVE)
+                                .status(DoctorStatus.INACTIVE)
                                 .build();
 
                 DoctorResponse response = DoctorMapper.toDto(doctor);
@@ -84,7 +84,7 @@ class DoctorMapperTest {
                                 .qualification("MBBS")
                                 .experienceYears(5)
                                 .phone("9876543210")
-                                .status(Status.ACTIVE)
+                                .status(DoctorStatus.ACTIVE)
                                 .build();
 
                 DoctorRequest request = DoctorRequest.builder()
@@ -96,7 +96,7 @@ class DoctorMapperTest {
                                 .qualification("MBBS, MD")
                                 .experienceYears(12)
                                 .phone("9876543211")
-                                .status(Status.INACTIVE)
+                                .status(DoctorStatus.INACTIVE)
                                 .build();
 
                 Doctor updatedDoctor = DoctorMapper.updateEntity(doctor, request);
@@ -111,6 +111,6 @@ class DoctorMapperTest {
                 assertThat(updatedDoctor.getQualification()).isEqualTo("MBBS, MD");
                 assertThat(updatedDoctor.getExperienceYears()).isEqualTo(12);
                 assertThat(updatedDoctor.getPhone()).isEqualTo("9876543211");
-                assertThat(updatedDoctor.getStatus()).isEqualTo(Status.INACTIVE);
+                assertThat(updatedDoctor.getStatus()).isEqualTo(DoctorStatus.INACTIVE);
         }
 }

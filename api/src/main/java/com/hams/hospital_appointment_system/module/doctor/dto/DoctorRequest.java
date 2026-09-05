@@ -1,7 +1,7 @@
 package com.hams.hospital_appointment_system.module.doctor.dto;
 
 import com.hams.hospital_appointment_system.common.enums.Gender;
-import com.hams.hospital_appointment_system.module.doctor.entity.Status;
+import com.hams.hospital_appointment_system.module.doctor.entity.DoctorStatus;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -47,5 +47,5 @@ public class DoctorRequest {
     private String phone;
 
     @NotNull(message = "Status is required")
-    private Status status;
+    private DoctorStatus status;
 }

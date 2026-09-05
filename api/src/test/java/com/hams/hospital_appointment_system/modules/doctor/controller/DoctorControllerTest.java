@@ -7,7 +7,7 @@ import com.hams.hospital_appointment_system.common.security.service.JwtService;
 import com.hams.hospital_appointment_system.module.doctor.controller.DoctorController;
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorRequest;
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorResponse;
-import com.hams.hospital_appointment_system.module.doctor.entity.Status;
+import com.hams.hospital_appointment_system.module.doctor.entity.DoctorStatus;
 import com.hams.hospital_appointment_system.module.doctor.service.DoctorService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ class DoctorControllerTest {
                                 .qualification("MBBS, MD")
                                 .experienceYears(10)
                                 .phone("9876543210")
-                                .status(Status.ACTIVE)
+                                .status(DoctorStatus.ACTIVE)
                                 .build();
         }
 

@@ -3,7 +3,7 @@ package com.hams.hospital_appointment_system.modules.doctor.specification;
 import com.hams.hospital_appointment_system.common.enums.Gender;
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorFilterRequest;
 import com.hams.hospital_appointment_system.module.doctor.entity.Doctor;
-import com.hams.hospital_appointment_system.module.doctor.entity.Status;
+import com.hams.hospital_appointment_system.module.doctor.entity.DoctorStatus;
 import com.hams.hospital_appointment_system.module.doctor.repository.DoctorRepository;
 import com.hams.hospital_appointment_system.module.doctor.specification.DoctorSpecification;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ class DoctorSpecificationTest {
         @Autowired
         private DoctorRepository doctorRepository;
 
-        private Doctor buildDoctor(String email, Gender gender, String specialization, Status status) {
+        private Doctor buildDoctor(String email, Gender gender, String specialization, DoctorStatus status) {
                 return Doctor.builder()
                                 .firstName("John")
                                 .lastName("Doe")
@@ -41,8 +41,8 @@ class DoctorSpecificationTest {
         @Test
         void byFilter_shouldReturnDoctors_matchingGender() {
 
-                doctorRepository.save(buildDoctor("male1@test.com", Gender.MALE, "Cardiology", Status.ACTIVE));
-                doctorRepository.save(buildDoctor("female1@test.com", Gender.FEMALE, "Cardiology", Status.ACTIVE));
+                doctorRepository.save(buildDoctor("male1@test.com", Gender.MALE, "Cardiology", DoctorStatus.ACTIVE));
+                doctorRepository.save(buildDoctor("female1@test.com", Gender.FEMALE, "Cardiology", DoctorStatus.ACTIVE));
 
                 DoctorFilterRequest filter = new DoctorFilterRequest();
                 filter.setGender(Gender.MALE);
@@ -56,8 +56,8 @@ class DoctorSpecificationTest {
         @Test
         void byFilter_shouldReturnDoctors_matchingSpecializationCaseInsensitive() {
 
-                doctorRepository.save(buildDoctor("cardio@test.com", Gender.MALE, "Cardiology", Status.ACTIVE));
-                doctorRepository.save(buildDoctor("neuro@test.com", Gender.MALE, "Neurology", Status.ACTIVE));
+                doctorRepository.save(buildDoctor("cardio@test.com", Gender.MALE, "Cardiology", DoctorStatus.ACTIVE));
+                doctorRepository.save(buildDoctor("neuro@test.com", Gender.MALE, "Neurology", DoctorStatus.ACTIVE));
 
                 DoctorFilterRequest filter = new DoctorFilterRequest();
                 filter.setSpecialization("CARDIOLOGY");
@@ -71,11 +71,11 @@ class DoctorSpecificationTest {
         @Test
         void byFilter_shouldReturnDoctors_matchingStatus() {
 
-                doctorRepository.save(buildDoctor("active@test.com", Gender.MALE, "Cardiology", Status.ACTIVE));
-                doctorRepository.save(buildDoctor("inactive@test.com", Gender.MALE, "Cardiology", Status.INACTIVE));
+                doctorRepository.save(buildDoctor("active@test.com", Gender.MALE, "Cardiology", DoctorStatus.ACTIVE));
+                doctorRepository.save(buildDoctor("inactive@test.com", Gender.MALE, "Cardiology", DoctorStatus.INACTIVE));
 
                 DoctorFilterRequest filter = new DoctorFilterRequest();
-                filter.setStatus(Status.INACTIVE);
+                filter.setStatus(DoctorStatus.INACTIVE);
 
                 List<Doctor> results = doctorRepository.findAll(DoctorSpecification.byFilter(filter));
 
@@ -86,15 +86,15 @@ class DoctorSpecificationTest {
         @Test
         void byFilter_shouldReturnDoctors_matchingAllFiltersCombined() {
 
-                doctorRepository.save(buildDoctor("match@test.com", Gender.FEMALE, "Neurology", Status.ACTIVE));
-                doctorRepository.save(buildDoctor("nomatch1@test.com", Gender.MALE, "Neurology", Status.ACTIVE));
-                doctorRepository.save(buildDoctor("nomatch2@test.com", Gender.FEMALE, "Cardiology", Status.ACTIVE));
-                doctorRepository.save(buildDoctor("nomatch3@test.com", Gender.FEMALE, "Neurology", Status.INACTIVE));
+                doctorRepository.save(buildDoctor("match@test.com", Gender.FEMALE, "Neurology", DoctorStatus.ACTIVE));
+                doctorRepository.save(buildDoctor("nomatch1@test.com", Gender.MALE, "Neurology", DoctorStatus.ACTIVE));
+                doctorRepository.save(buildDoctor("nomatch2@test.com", Gender.FEMALE, "Cardiology", DoctorStatus.ACTIVE));
+                doctorRepository.save(buildDoctor("nomatch3@test.com", Gender.FEMALE, "Neurology", DoctorStatus.INACTIVE));
 
                 DoctorFilterRequest filter = new DoctorFilterRequest();
                 filter.setGender(Gender.FEMALE);
                 filter.setSpecialization("Neurology");
-                filter.setStatus(Status.ACTIVE);
+                filter.setStatus(DoctorStatus.ACTIVE);
 
                 List<Doctor> results = doctorRepository.findAll(DoctorSpecification.byFilter(filter));
 
@@ -105,8 +105,8 @@ class DoctorSpecificationTest {
         @Test
         void byFilter_shouldReturnAllDoctors_whenNoFiltersProvided() {
 
-                doctorRepository.save(buildDoctor("doc1@test.com", Gender.MALE, "Cardiology", Status.ACTIVE));
-                doctorRepository.save(buildDoctor("doc2@test.com", Gender.FEMALE, "Neurology", Status.INACTIVE));
+                doctorRepository.save(buildDoctor("doc1@test.com", Gender.MALE, "Cardiology", DoctorStatus.ACTIVE));
+                doctorRepository.save(buildDoctor("doc2@test.com", Gender.FEMALE, "Neurology", DoctorStatus.INACTIVE));
 
                 DoctorFilterRequest filter = new DoctorFilterRequest();
 

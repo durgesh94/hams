@@ -7,7 +7,7 @@ import com.hams.hospital_appointment_system.module.doctor.dto.DoctorFilterReques
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorRequest;
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorResponse;
 import com.hams.hospital_appointment_system.module.doctor.entity.Doctor;
-import com.hams.hospital_appointment_system.module.doctor.entity.Status;
+import com.hams.hospital_appointment_system.module.doctor.entity.DoctorStatus;
 import com.hams.hospital_appointment_system.module.doctor.repository.DoctorRepository;
 import com.hams.hospital_appointment_system.module.doctor.service.impl.DoctorServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ class DoctorServiceTest {
                                 .qualification("MBBS, MD")
                                 .experienceYears(10)
                                 .phone("9876543210")
-                                .status(Status.ACTIVE)
+                                .status(DoctorStatus.ACTIVE)
                                 .build();
         }
 
@@ -60,7 +60,7 @@ class DoctorServiceTest {
                                 .qualification("MBBS, MD")
                                 .experienceYears(10)
                                 .phone("9876543210")
-                                .status(Status.ACTIVE)
+                                .status(DoctorStatus.ACTIVE)
                                 .build();
         }
 
@@ -202,7 +202,7 @@ class DoctorServiceTest {
                 DoctorFilterRequest filterRequest = new DoctorFilterRequest();
                 filterRequest.setGender(Gender.MALE);
                 filterRequest.setSpecialization("Cardiology");
-                filterRequest.setStatus(Status.ACTIVE);
+                filterRequest.setStatus(DoctorStatus.ACTIVE);
 
                 Doctor doctor = buildDoctor(1L);
 
