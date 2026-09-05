@@ -5,9 +5,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -85,10 +86,11 @@ public class AppointmentController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<ApiResponse<List<AppointmentResponse>>> getAppointments(
-            @ModelAttribute AppointmentFilter filter) {
-        List<AppointmentResponse> response = appointmentService.getAppointments(filter);
-        ApiResponse<List<AppointmentResponse>> apiResponse = ApiResponse.<List<AppointmentResponse>>builder()
+    public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getAppointments(
+            @ModelAttribute AppointmentFilter filter,
+            Pageable pageable) {
+        Page<AppointmentResponse> response = appointmentService.getAppointments(filter, pageable);
+        ApiResponse<Page<AppointmentResponse>> apiResponse = ApiResponse.<Page<AppointmentResponse>>builder()
                 .status(HttpStatus.OK.value())
                 .message("Appointments retrieved successfully")
                 .data(response)
@@ -96,5 +98,4 @@ public class AppointmentController {
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
-
 }

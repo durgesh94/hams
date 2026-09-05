@@ -17,6 +17,9 @@ import com.hams.hospital_appointment_system.module.doctor.repository.DoctorRepos
 import com.hams.hospital_appointment_system.module.patient.entity.Patient;
 import com.hams.hospital_appointment_system.module.patient.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,10 +113,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public List<AppointmentResponse> getAppointments(AppointmentFilter filter) {
-        return appointmentRepository.findAll(AppointmentSpecification.filter(filter))
-                .stream()
-                .map(AppointmentMapper::toDto)
-                .toList();
+    public Page<AppointmentResponse> getAppointments(AppointmentFilter filter, Pageable pageable) {
+        return appointmentRepository.findAll(AppointmentSpecification.filter(filter), pageable)
+                .map(AppointmentMapper::toDto);
     }
 }
