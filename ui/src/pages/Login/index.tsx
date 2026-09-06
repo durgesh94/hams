@@ -12,15 +12,22 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
+import { useAppDispatch } from "../../app/hooks";
+import { setCredentials } from "../../features/auth/authSlice";
+import { useLoginMutation } from "../../features/auth/authApi";
+
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const [login, { isLoading }] = useLoginMutation();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setError("");
@@ -30,13 +37,30 @@ const Login = () => {
       return;
     }
 
-    // Mock login for now
-    console.log("Login:", {
-      username,
-      password,
-    });
+    try {
+      const response = await login({
+        username: username.trim(),
+        password,
+      }).unwrap();
 
-    navigate("/dashboard");
+      dispatch(
+        setCredentials({
+          token: response.token,
+          user: {
+            username: "",
+            role: "",
+          },
+        }),
+      );
+
+      navigate("/dashboard", {
+        replace: true,
+      });
+    } catch (error) {
+      setError(
+        `${error instanceof Error ? error.message : "An unexpected error occurred."}`,
+      );
+    }
   };
 
   return (
@@ -121,6 +145,7 @@ const Login = () => {
             value={username}
             onChange={(event) => setUsername(event.target.value)}
             autoComplete="username"
+            disabled={isLoading}
             sx={{ mb: 2 }}
           />
 
@@ -132,6 +157,7 @@ const Login = () => {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             autoComplete="current-password"
+            disabled={isLoading}
             slotProps={{
               input: {
                 endAdornment: (
@@ -139,6 +165,7 @@ const Login = () => {
                     <IconButton
                       onClick={() => setShowPassword((previous) => !previous)}
                       edge="end"
+                      disabled={isLoading}
                       aria-label={
                         showPassword ? "Hide password" : "Show password"
                       }
@@ -157,12 +184,13 @@ const Login = () => {
             variant="contained"
             fullWidth
             size="large"
+            disabled={isLoading}
             sx={{
               py: 1.25,
               fontWeight: 600,
             }}
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </Button>
         </Box>
       </Paper>

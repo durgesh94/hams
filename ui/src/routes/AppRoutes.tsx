@@ -10,6 +10,7 @@ import AppLayout from "../components/layout/AppLayout";
 import Appointments from "../pages/Appointment";
 import Doctor from "../pages/Doctor";
 import Patient from "../pages/Patient";
+import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => {
   return (
@@ -18,7 +19,13 @@ const AppRoutes = () => {
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         {/* Private Routes */}
-        <Route element={<AppLayout />}>
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/doctors" element={<Doctor />} />

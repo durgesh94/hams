@@ -4,6 +4,7 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 
 import { store } from "../store";
 import theme from "../../theme/theme";
+import AuthInitializer from "../../features/auth/AuthInitializer";
 
 interface AppProvidersProps {
   children: ReactNode;
@@ -14,7 +15,7 @@ const AppProviders = ({ children }: AppProvidersProps) => {
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        {children}
+        <AuthInitializer>{children}</AuthInitializer>
       </ThemeProvider>
     </Provider>
   );
