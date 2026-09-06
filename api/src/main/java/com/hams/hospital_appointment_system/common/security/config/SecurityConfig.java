@@ -12,6 +12,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import com.hams.hospital_appointment_system.common.config.CorsConfig;
 
 @Configuration
 @EnableWebSecurity
@@ -31,8 +32,11 @@ public class SecurityConfig {
         }
 
         @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, CorsConfig corsConfig)
+                        throws Exception {
                 return httpSecurity
+                                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
+
                                 .csrf(csrf -> csrf.disable())
 
                                 .sessionManagement(session -> session
