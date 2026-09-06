@@ -57,12 +57,14 @@ const Login = () => {
         replace: true,
       });
     } catch (error) {
+        console.error(error);
+        
       setError(
-        `${error instanceof Error ? error.message : "An unexpected error occurred."}`,
+        error instanceof Error ? error.message : "Invalid username or password.",
       );
     }
   };
-
+  
   return (
     <Box
       sx={{
