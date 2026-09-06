@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Visibility, VisibilityOff, LocalHospital } from "@mui/icons-material";
+import { getApiErrorMessage } from "../../features/api/apiError";
 import {
   Alert,
   Box,
@@ -57,14 +58,10 @@ const Login = () => {
         replace: true,
       });
     } catch (error) {
-        console.error(error);
-        
-      setError(
-        error instanceof Error ? error.message : "Invalid username or password.",
-      );
+      setError(getApiErrorMessage(error));
     }
   };
-  
+
   return (
     <Box
       sx={{
