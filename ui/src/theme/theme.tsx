@@ -36,6 +36,21 @@ const theme = createTheme({
   shape: {
     borderRadius: 8,
   },
+  components: {
+    MuiButton: {
+      defaultProps: {
+        disableElevation: true,
+      },
+    },
+
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          fontWeight: 600,
+        },
+      },
+    },
+  },
 });
 
 export default theme;
