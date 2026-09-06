@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
 import { Add, Delete, Edit, Search, Visibility } from "@mui/icons-material";
 import {
+  Alert,
   Box,
   Button,
   Chip,
+  CircularProgress,
   IconButton,
   InputAdornment,
   Paper,
@@ -18,95 +20,60 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { useGetDoctorsQuery } from "../../features/doctors/doctorApi";
+import type { Doctor } from "../../features/doctors/types";
 
-interface Doctor {
-  id: number;
-  name: string;
-  specialization: string;
-  phone: string;
-  email: string;
-  appointmentCount: number;
-}
-
-const mockDoctors: Doctor[] = [
-  {
-    id: 1,
-    name: "Dr. Rajesh Sharma",
-    specialization: "Cardiologist",
-    phone: "9876543210",
-    email: "rajesh.sharma@hospital.com",
-    appointmentCount: 12,
-  },
-  {
-    id: 2,
-    name: "Dr. Priya Patil",
-    specialization: "Neurologist",
-    phone: "9876543211",
-    email: "priya.patil@hospital.com",
-    appointmentCount: 8,
-  },
-  {
-    id: 3,
-    name: "Dr. Amit Deshmukh",
-    specialization: "Dermatologist",
-    phone: "9876543212",
-    email: "amit.deshmukh@hospital.com",
-    appointmentCount: 5,
-  },
-  {
-    id: 4,
-    name: "Dr. Sneha Kulkarni",
-    specialization: "Pediatrician",
-    phone: "9876543213",
-    email: "sneha.kulkarni@hospital.com",
-    appointmentCount: 15,
-  },
-  {
-    id: 5,
-    name: "Dr. Rahul Joshi",
-    specialization: "Orthopedic",
-    phone: "9876543214",
-    email: "rahul.joshi@hospital.com",
-    appointmentCount: 10,
-  },
-  {
-    id: 6,
-    name: "Dr. Neha More",
-    specialization: "Gynecologist",
-    phone: "9876543215",
-    email: "neha.more@hospital.com",
-    appointmentCount: 7,
-  },
-  {
-    id: 7,
-    name: "Dr. Vikram Singh",
-    specialization: "General Physician",
-    phone: "9876543216",
-    email: "vikram.singh@hospital.com",
-    appointmentCount: 18,
-  },
-];
-
-const Doctor = () => {
+const DoctorPage = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const {
+    data: doctors = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetDoctorsQuery();
+
+  const errorMessage = useMemo(() => {
+    if (!error) {
+      return "Unable to load doctors. Please try again.";
+    }
+
+    if ("status" in error) {
+      const errorData = error.data;
+
+      if (
+        errorData &&
+        typeof errorData === "object" &&
+        "message" in errorData
+      ) {
+        return String(errorData.message);
+      }
+
+      return `Unable to load doctors. Request failed with status ${error.status}.`;
+    }
+
+    return error.message ?? "Unable to load doctors. Please try again.";
+  }, [error]);
 
   const filteredDoctors = useMemo(() => {
     const searchValue = search.toLowerCase().trim();
 
     if (!searchValue) {
-      return mockDoctors;
+      return doctors;
     }
 
-    return mockDoctors.filter(
+    return doctors.filter(
       (doctor) =>
-        doctor.name.toLowerCase().includes(searchValue) ||
+        doctor.firstName.toLowerCase().includes(searchValue) ||
+        doctor.lastName.toLowerCase().includes(searchValue) ||
         doctor.specialization.toLowerCase().includes(searchValue) ||
-        doctor.phone.includes(searchValue) ||
-        doctor.email.toLowerCase().includes(searchValue),
+        doctor.qualification.toLowerCase().includes(searchValue) ||
+        doctor.phone.includes(searchValue),
     );
-  }, [search]);
+  }, [doctors, search]);
 
   const paginatedDoctors = filteredDoctors.slice(
     page * rowsPerPage,
@@ -183,7 +150,7 @@ const Doctor = () => {
       >
         <TextField
           fullWidth
-          placeholder="Search by name, specialization, phone or email"
+          placeholder="Search by name, specialization, qualification or phone"
           value={search}
           onChange={handleSearchChange}
           size="small"
@@ -223,15 +190,39 @@ const Doctor = () => {
                 <TableCell>ID</TableCell>
                 <TableCell>Doctor Name</TableCell>
                 <TableCell>Specialization</TableCell>
+                <TableCell>Qualification</TableCell>
                 <TableCell>Phone</TableCell>
-                <TableCell>Email</TableCell>
                 <TableCell align="center">Appointments</TableCell>
                 <TableCell align="center">Actions</TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {paginatedDoctors.length > 0 ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
+                    <CircularProgress size={28} />
+                    <Typography color="text.secondary" sx={{ mt: 2 }}>
+                      Loading doctors...
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : isError ? (
+                <TableRow>
+                  <TableCell colSpan={7} sx={{ py: 4 }}>
+                    <Alert
+                      severity="error"
+                      action={
+                        <Button color="inherit" size="small" onClick={refetch}>
+                          Retry
+                        </Button>
+                      }
+                    >
+                      {errorMessage}
+                    </Alert>
+                  </TableCell>
+                </TableRow>
+              ) : paginatedDoctors.length > 0 ? (
                 paginatedDoctors.map((doctor) => (
                   <TableRow
                     key={doctor.id}
@@ -245,14 +236,14 @@ const Doctor = () => {
                     <TableCell>{doctor.id}</TableCell>
 
                     <TableCell>
-                      <Typography>{doctor.name}</Typography>
+                      <Typography>{doctor.firstName} {doctor.lastName}</Typography>
                     </TableCell>
 
                     <TableCell>{doctor.specialization}</TableCell>
 
-                    <TableCell>{doctor.phone}</TableCell>
+                    <TableCell>{doctor.qualification}</TableCell>
 
-                    <TableCell>{doctor.email}</TableCell>
+                    <TableCell>{doctor.phone}</TableCell>
 
                     <TableCell align="center">
                       <Chip
@@ -268,7 +259,7 @@ const Doctor = () => {
                           size="small"
                           color="primary"
                           onClick={() => handleView(doctor)}
-                          aria-label={`View ${doctor.name}`}
+                          aria-label={`View ${doctor.firstName}`}
                         >
                           <Visibility fontSize="small" />
                         </IconButton>
@@ -279,7 +270,7 @@ const Doctor = () => {
                           size="small"
                           color="secondary"
                           onClick={() => handleEdit(doctor)}
-                          aria-label={`Edit ${doctor.name}`}
+                          aria-label={`Edit ${doctor.firstName}`}
                         >
                           <Edit fontSize="small" />
                         </IconButton>
@@ -290,7 +281,7 @@ const Doctor = () => {
                           size="small"
                           color="error"
                           onClick={() => handleDelete(doctor)}
-                          aria-label={`Delete ${doctor.name}`}
+                          aria-label={`Delete ${doctor.firstName}`}
                         >
                           <Delete fontSize="small" />
                         </IconButton>
@@ -311,18 +302,20 @@ const Doctor = () => {
           </Table>
         </TableContainer>
 
-        <TablePagination
-          component="div"
-          count={filteredDoctors.length}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[5, 10, 25]}
-        />
+        {!isLoading && !isError && (
+          <TablePagination
+            component="div"
+            count={filteredDoctors.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[5, 10, 25]}
+          />
+        )}
       </Paper>
     </Box>
   );
 };
 
-export default Doctor;
+export default DoctorPage;
