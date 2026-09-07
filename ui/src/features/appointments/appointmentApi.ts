@@ -9,48 +9,48 @@ import type {
 
 export const appointmentApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAppointments: builder.query<ApiResponse<AppointmentPage>, void>({
-      query: () => "/api/v1/appointments/filter",
+    getAppointments: builder.query<AppointmentPage, void>({
+      query: () => "/api/v1/appointments",
+      transformResponse: (response: ApiResponse<AppointmentPage>) =>
+        response.data,
       providesTags: ["Appointment"],
     }),
 
-    getAppointmentById: builder.query<ApiResponse<Appointment>, number>({
+    getAppointmentById: builder.query<Appointment, number>({
       query: (id) => `/api/v1/appointments/${id}`,
+      transformResponse: (response: ApiResponse<Appointment>) => response.data,
       providesTags: (_result, _error, id) => [{ type: "Appointment", id }],
     }),
 
-    createAppointment: builder.mutation<
-      ApiResponse<Appointment>,
-      CreateAppointmentRequest
-    >({
+    createAppointment: builder.mutation<Appointment, CreateAppointmentRequest>({
       query: (appointment) => ({
         url: "/api/v1/appointments",
         method: "POST",
         body: appointment,
       }),
+      transformResponse: (response: ApiResponse<Appointment>) => response.data,
       invalidatesTags: ["Appointment"],
     }),
 
-    updateAppointment: builder.mutation<
-      ApiResponse<Appointment>,
-      UpdateAppointmentRequest
-    >({
+    updateAppointment: builder.mutation<Appointment, UpdateAppointmentRequest>({
       query: ({ id, ...appointment }) => ({
         url: `/api/v1/appointments/${id}`,
         method: "PUT",
         body: appointment,
       }),
+      transformResponse: (response: ApiResponse<Appointment>) => response.data,
       invalidatesTags: (_result, _error, { id }) => [
         "Appointment",
         { type: "Appointment", id },
       ],
     }),
 
-    deleteAppointment: builder.mutation<ApiResponse<null>, number>({
+    deleteAppointment: builder.mutation<null, number>({
       query: (id) => ({
         url: `/api/v1/appointments/${id}`,
         method: "DELETE",
       }),
+      transformResponse: (response: ApiResponse<null>) => response.data,
       invalidatesTags: ["Appointment"],
     }),
   }),

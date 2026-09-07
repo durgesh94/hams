@@ -1,346 +1,236 @@
-import { useMemo, useState } from "react";
-import { Add, Delete, Edit, Search, Visibility } from "@mui/icons-material";
-import {
-  Box,
-  CircularProgress,
-  Chip,
-  IconButton,
-  InputAdornment,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TablePagination,
-  TableRow,
-  TableHead,
-  TextField,
-  Tooltip,
-  Typography,
-  Button,
-} from "@mui/material";
+import { useState } from "react";
+import { Box } from "@mui/material";
 
+import AppDialog from "../../components/common/AppDialog";
+import PageHeader from "../../components/common/PageHeader";
+import ToastMessage from "../../components/common/ToastMessage";
+import AddForm from "../../components/appointments/AddForm";
+import AppointmentTable from "../../components/appointments/AppointmentTable";
+import UpdateForm from "../../components/appointments/UpdateForm";
+import ViewDetails from "../../components/appointments/ViewDetails";
+import {
+  useCreateAppointmentMutation,
+  useDeleteAppointmentMutation,
+  useGetAppointmentsQuery,
+  useUpdateAppointmentMutation,
+} from "../../features/appointments/appointmentApi";
 import type {
   Appointment,
-  AppointmentStatus,
+  CreateAppointmentRequest,
+  UpdateAppointmentRequest,
 } from "../../features/appointments/types";
-import { useGetAppointmentsQuery } from "../../features/appointments/appointmentApi";
-import { getApiErrorMessage } from "../../features/api/apiError";
-
-const getStatusColor = (
-  status: AppointmentStatus,
-): "success" | "warning" | "error" | "primary" | "default" => {
-  switch (status) {
-    case "CONFIRMED":
-      return "success";
-
-    case "BOOKED":
-      return "primary";
-
-    case "CANCELLED":
-      return "error";
-
-    case "COMPLETED":
-      return "default";
-
-    default:
-      return "default";
-  }
-};
-
-const formatDate = (date: string): string => {
-  const parsedDate = new Date(`${date}T00:00:00`);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return date;
-  }
-
-  return parsedDate.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-};
-
-const formatTime = (time: string): string => {
-  const parsedTime = new Date(`1970-01-01T${time}`);
-
-  if (Number.isNaN(parsedTime.getTime())) {
-    return time;
-  }
-
-  return parsedTime.toLocaleTimeString("en-IN", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
-};
+import { useGetDoctorsQuery } from "../../features/doctors/doctorApi";
+import { useGetPatientsQuery } from "../../features/patients/patientApi";
+import {
+  getAppointmentFormId,
+  getDialogAction,
+  getDialogButtonLabel,
+} from "../../utils/appointment-utils";
 
 const Appointments = () => {
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  const { data, isLoading, isError, error } = useGetAppointmentsQuery();
-
-  const appointments = data?.data.content ?? [];
-
-  const filteredAppointments = useMemo(() => {
-    const searchValue = search.toLowerCase().trim();
-
-    if (!searchValue) {
-      return appointments;
-    }
-
-    return appointments.filter(
-      (appointment) =>
-        appointment.patientName.toLowerCase().includes(searchValue) ||
-        appointment.doctorName.toLowerCase().includes(searchValue) ||
-        appointment.reason.toLowerCase().includes(searchValue) ||
-        appointment.status.toLowerCase().includes(searchValue),
-    );
-  }, [search, appointments]);
-
-  const paginatedAppointments = filteredAppointments.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage,
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogContentId, setDialogContentId] = useState(0);
+  const [dialogTitle, setDialogTitle] = useState("");
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState<"success" | "error">(
+    "error",
   );
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
-    setPage(0);
+  const {
+    data: appointmentPage,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetAppointmentsQuery();
+
+  const { data: doctors = [] } = useGetDoctorsQuery();
+  const { data: patients = [] } = useGetPatientsQuery();
+
+  const [createAppointment] = useCreateAppointmentMutation();
+  const [updateAppointment] = useUpdateAppointmentMutation();
+  const [deleteAppointment] = useDeleteAppointmentMutation();
+
+  const appointments = appointmentPage?.content ?? [];
+
+  const handleToastClose = () => {
+    setToastOpen(false);
   };
 
-  const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
+  const showErrorToast = (error: unknown) => {
+    let message = "An error occurred. Please try again.";
+
+    if (error && typeof error === "object") {
+      const err = error as Record<string, unknown>;
+      const data = err.data as Record<string, unknown> | undefined;
+
+      if (data?.message && typeof data.message === "string") {
+        message = data.message;
+      } else if (err.message && typeof err.message === "string") {
+        message = err.message;
+      }
+    }
+
+    setToastMessage(message);
+    setToastSeverity("error");
+    setToastOpen(true);
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setRowsPerPage(Number.parseInt(event.target.value, 10));
-    setPage(0);
+  const showSuccessToast = (message: string) => {
+    setToastMessage(message);
+    setToastSeverity("success");
+    setToastOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
   };
 
   const handleAdd = () => {
-    console.log("Add appointment");
+    setSelectedAppointment(null);
+    setDialogTitle("Add Appointment");
+    setDialogContentId(1);
+    setIsDialogOpen(true);
   };
 
   const handleView = (appointment: Appointment) => {
-    console.log("View appointment:", appointment);
+    setSelectedAppointment(appointment);
+    setDialogTitle("View Appointment");
+    setDialogContentId(4);
+    setIsDialogOpen(true);
   };
 
   const handleEdit = (appointment: Appointment) => {
-    console.log("Edit appointment:", appointment);
+    setSelectedAppointment(appointment);
+    setDialogTitle("Edit Appointment");
+    setDialogContentId(2);
+    setIsDialogOpen(true);
   };
 
   const handleDelete = (appointment: Appointment) => {
-    console.log("Delete appointment:", appointment);
+    setSelectedAppointment(appointment);
+    setDialogTitle("Delete Appointment");
+    setDialogContentId(3);
+    setIsDialogOpen(true);
+  };
+
+  const handleAddFormSubmit = async (data: CreateAppointmentRequest) => {
+    setIsSubmitting(true);
+
+    const result = await createAppointment(data);
+
+    if (result.error) {
+      showErrorToast(result.error);
+    } else {
+      showSuccessToast("Appointment added successfully");
+      setIsDialogOpen(false);
+    }
+
+    setIsSubmitting(false);
+  };
+
+  const handleUpdateFormSubmit = async (data: UpdateAppointmentRequest) => {
+    setIsSubmitting(true);
+
+    const result = await updateAppointment(data);
+
+    if (result.error) {
+      showErrorToast(result.error);
+    } else {
+      showSuccessToast("Appointment updated successfully");
+      setIsDialogOpen(false);
+    }
+
+    setIsSubmitting(false);
+  };
+
+  const handleDeleteConfirm = async () => {
+    setIsSubmitting(true);
+
+    if (selectedAppointment?.id) {
+      const result = await deleteAppointment(selectedAppointment.id);
+
+      if (result.error) {
+        showErrorToast(result.error);
+      } else {
+        showSuccessToast("Appointment deleted successfully");
+        setIsDialogOpen(false);
+      }
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
     <Box>
-      {/* Page Header */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: { xs: "flex-start", sm: "center" },
-          flexDirection: { xs: "column", sm: "row" },
-          gap: 2,
-          mb: 3,
-        }}
+      <PageHeader
+        title="Appointments"
+        subtitle="Manage hospital appointments"
+        actionLabel="Add Appointment"
+        handleAction={handleAdd}
+      />
+
+      <AppointmentTable
+        appointments={appointments}
+        isLoading={isLoading}
+        isError={isError}
+        error={error}
+        onRefetch={refetch}
+        onView={handleView}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+
+      <AppDialog
+        open={isDialogOpen}
+        title={dialogTitle}
+        onClose={handleDialogClose}
+        formId={getAppointmentFormId(dialogContentId)}
+        submitText={getDialogButtonLabel(dialogContentId)}
+        onSubmit={getDialogAction(
+          dialogContentId,
+          handleDeleteConfirm,
+          handleDialogClose,
+        )}
+        isSubmitting={isSubmitting}
       >
-        <Box>
-          <Typography variant="h4">Appointments</Typography>
+        {dialogContentId === 1 && (
+          <AddForm
+            doctors={doctors}
+            patients={patients}
+            onSubmit={handleAddFormSubmit}
+            isSubmitting={isSubmitting}
+          />
+        )}
+        {dialogContentId === 2 && (
+          <UpdateForm
+            appointment={selectedAppointment}
+            doctors={doctors}
+            patients={patients}
+            onSubmit={handleUpdateFormSubmit}
+            isSubmitting={isSubmitting}
+          />
+        )}
+        {dialogContentId === 3 && (
+          <Box>
+            Do you want to delete appointment #{selectedAppointment?.id}?
+          </Box>
+        )}
+        {dialogContentId === 4 && (
+          <ViewDetails appointment={selectedAppointment} />
+        )}
+      </AppDialog>
 
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Manage hospital appointments
-          </Typography>
-        </Box>
-
-        <Button variant="contained" startIcon={<Add />} onClick={handleAdd}>
-          Add Appointment
-        </Button>
-      </Box>
-
-      {/* Search */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 2,
-          mb: 2,
-          border: "1px solid",
-          borderColor: "divider",
-        }}
-      >
-        <TextField
-          fullWidth
-          size="small"
-          placeholder="Search by patient, doctor, reason or status"
-          value={search}
-          onChange={handleSearchChange}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search color="action" />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </Paper>
-
-      {/* Appointment Table */}
-      <Paper
-        elevation={0}
-        sx={{
-          border: "1px solid",
-          borderColor: "divider",
-          overflow: "hidden",
-        }}
-      >
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow
-                sx={{
-                  backgroundColor: "primary.main",
-                  "& .MuiTableCell-head": {
-                    color: "primary.contrastText",
-                    fontWeight: 600,
-                  },
-                }}
-              >
-                <TableCell>ID</TableCell>
-                <TableCell>Patient</TableCell>
-                <TableCell>Doctor</TableCell>
-                <TableCell>Date</TableCell>
-                <TableCell>Time</TableCell>
-                <TableCell>Reason</TableCell>
-                <TableCell align="center">Status</TableCell>
-                <TableCell align="center">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                    <CircularProgress size={32} />
-                  </TableCell>
-                </TableRow>
-              ) : isError ? (
-                <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                    <Typography color="error">
-                      {getApiErrorMessage(error)}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : paginatedAppointments.length > 0 ? (
-                paginatedAppointments.map((appointment) => (
-                  <TableRow
-                    key={appointment.id}
-                    hover
-                    sx={{
-                      "&:last-child td": {
-                        borderBottom: 0,
-                      },
-                    }}
-                  >
-                    <TableCell>{appointment.id}</TableCell>
-
-                    <TableCell>
-                      <Typography variant="body2">
-                        {appointment.patientName}
-                      </Typography>
-                    </TableCell>
-
-                    <TableCell>{appointment.doctorName}</TableCell>
-
-                    <TableCell>
-                      {formatDate(appointment.appointmentDate)}
-                    </TableCell>
-
-                    <TableCell>
-                      {formatTime(appointment.appointmentTime)}
-                    </TableCell>
-
-                    <TableCell>{appointment.reason}</TableCell>
-
-                    <TableCell align="center">
-                      <Chip
-                        label={appointment.status}
-                        color={getStatusColor(appointment.status)}
-                        size="small"
-                        sx={{
-                          fontWeight: 500,
-                          minWidth: 90,
-                        }}
-                      />
-                    </TableCell>
-
-                    <TableCell align="center">
-                      <Tooltip title="View">
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => handleView(appointment)}
-                          aria-label={`View appointment ${appointment.id}`}
-                        >
-                          <Visibility fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-
-                      <Tooltip title="Edit">
-                        <IconButton
-                          size="small"
-                          color="secondary"
-                          onClick={() => handleEdit(appointment)}
-                          aria-label={`Edit appointment ${appointment.id}`}
-                        >
-                          <Edit fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-
-                      <Tooltip title="Delete">
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => handleDelete(appointment)}
-                          aria-label={`Delete appointment ${appointment.id}`}
-                        >
-                          <Delete fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                    <Typography color="text.secondary">
-                      No appointments found
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <TablePagination
-          component="div"
-          count={filteredAppointments.length}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[5, 10, 25]}
-        />
-      </Paper>
+      <ToastMessage
+        toastOpen={toastOpen}
+        toastMessage={toastMessage}
+        toastSeverity={toastSeverity}
+        handleToastClose={handleToastClose}
+      />
     </Box>
   );
 };
