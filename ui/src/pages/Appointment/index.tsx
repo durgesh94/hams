@@ -41,7 +41,7 @@ const Appointments = () => {
   );
 
   const {
-    data: appointmentPage,
+    data: appointments = [],
     isLoading,
     isError,
     error,
@@ -54,8 +54,6 @@ const Appointments = () => {
   const [createAppointment] = useCreateAppointmentMutation();
   const [updateAppointment] = useUpdateAppointmentMutation();
   const [deleteAppointment] = useDeleteAppointmentMutation();
-
-  const appointments = appointmentPage?.content ?? [];
 
   const handleToastClose = () => {
     setToastOpen(false);

@@ -2,16 +2,15 @@ import { baseApi } from "../api/baseApi";
 import type { ApiResponse } from "../api/types";
 import type {
   Appointment,
-  AppointmentPage,
   CreateAppointmentRequest,
   UpdateAppointmentRequest,
 } from "./types";
 
 export const appointmentApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAppointments: builder.query<AppointmentPage, void>({
+    getAppointments: builder.query<Appointment[], void>({
       query: () => "/api/v1/appointments",
-      transformResponse: (response: ApiResponse<AppointmentPage>) =>
+      transformResponse: (response: ApiResponse<Appointment[]>) =>
         response.data,
       providesTags: ["Appointment"],
     }),

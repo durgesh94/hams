@@ -33,15 +33,3 @@ export interface UpdateAppointmentRequest {
   notes: string;
   status: AppointmentStatus;
 }
-
-export interface AppointmentPage {
-  content: Appointment[];
-  empty: boolean;
-  first: boolean;
-  last: boolean;
-  number: number;
-  numberOfElements: number;
-  size: number;
-  totalElements: number;
-  totalPages: number;
-}
