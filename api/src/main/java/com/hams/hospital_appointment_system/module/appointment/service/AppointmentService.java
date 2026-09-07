@@ -3,7 +3,7 @@ package com.hams.hospital_appointment_system.module.appointment.service;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentFilter;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentRequest;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentResponse;
-
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -20,5 +20,7 @@ public interface AppointmentService {
     AppointmentResponse updateAppointmentStatus(Long appointmentId, AppointmentStatus status);
 
     Page<AppointmentResponse> getAppointments(AppointmentFilter filter, Pageable pageable);
+
+    List<AppointmentResponse> getAppointmentsList();
 
 }
