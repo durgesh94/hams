@@ -22,11 +22,20 @@ import {
 } from "@mui/material";
 import type { Doctor } from "../../features/doctors/types";
 
+type ApiError =
+  | {
+      status: number | string;
+      data?: unknown;
+    }
+  | {
+      message?: string;
+    };
+
 interface DoctorTableProps {
   doctors: Doctor[];
   isLoading: boolean;
   isError: boolean;
-  error: any | null;
+  error: ApiError | null;
   onRefetch: () => void;
   onView: (doctor: Doctor) => void;
   onEdit: (doctor: Doctor) => void;

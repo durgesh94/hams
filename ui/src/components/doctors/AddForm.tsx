@@ -9,7 +9,7 @@ import {
   Select,
   TextField,
 } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import type {
@@ -87,9 +87,9 @@ const DoctorForm = ({
   const {
     register,
     handleSubmit,
+    control,
     reset,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<DoctorFormValues>({
     resolver: zodResolver(doctorSchema),
@@ -106,8 +106,8 @@ const DoctorForm = ({
     },
   });
 
-  const gender = watch("gender");
-  const status = watch("status");
+  const gender = useWatch({ control, name: "gender" });
+  const status = useWatch({ control, name: "status" });
 
   useEffect(() => {
     if (doctor) {
