@@ -1,10 +1,5 @@
-export const DoctorStatus = {
-  ACTIVE: "ACTIVE",
-  INACTIVE: "INACTIVE",
-  ON_LEAVE: "ON_LEAVE",
-} as const;
+export type DoctorStatus = "ACTIVE" | "INACTIVE" | "ON_LEAVE"; 
 
-export type DoctorStatus = (typeof DoctorStatus)[keyof typeof DoctorStatus];
 
 export interface Doctor {
   id: number;
