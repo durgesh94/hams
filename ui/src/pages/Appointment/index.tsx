@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Add, Delete, Edit, Search, Visibility } from "@mui/icons-material";
 import {
   Box,
-  Button,
+  CircularProgress,
   Chip,
   IconButton,
   InputAdornment,
@@ -11,110 +11,31 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
   TablePagination,
   TableRow,
+  TableHead,
   TextField,
   Tooltip,
   Typography,
+  Button,
 } from "@mui/material";
 
-type AppointmentStatus = "CONFIRMED" | "PENDING" | "COMPLETED" | "CANCELLED";
-
-interface Appointment {
-  id: number;
-  patientName: string;
-  patientEmail: string;
-  doctorName: string;
-  date: string;
-  time: string;
-  status: AppointmentStatus;
-}
-
-const mockAppointments: Appointment[] = [
-  {
-    id: 1,
-    patientName: "Rahul Kumar",
-    patientEmail: "rahul.kumar@gmail.com",
-    doctorName: "Dr. Rajesh Sharma",
-    date: "05 Sep 2026",
-    time: "10:00 AM",
-    status: "CONFIRMED",
-  },
-  {
-    id: 2,
-    patientName: "Priya Sharma",
-    patientEmail: "priya.sharma@gmail.com",
-    doctorName: "Dr. Priya Patil",
-    date: "05 Sep 2026",
-    time: "11:30 AM",
-    status: "PENDING",
-  },
-  {
-    id: 3,
-    patientName: "Amit Patil",
-    patientEmail: "amit.patil@gmail.com",
-    doctorName: "Dr. Amit Deshmukh",
-    date: "06 Sep 2026",
-    time: "02:00 PM",
-    status: "COMPLETED",
-  },
-  {
-    id: 4,
-    patientName: "Sneha Deshmukh",
-    patientEmail: "sneha.deshmukh@gmail.com",
-    doctorName: "Dr. Sneha Kulkarni",
-    date: "07 Sep 2026",
-    time: "04:30 PM",
-    status: "CANCELLED",
-  },
-  {
-    id: 5,
-    patientName: "Vikram Joshi",
-    patientEmail: "vikram.joshi@gmail.com",
-    doctorName: "Dr. Rahul Joshi",
-    date: "08 Sep 2026",
-    time: "09:30 AM",
-    status: "CONFIRMED",
-  },
-  {
-    id: 6,
-    patientName: "Neha More",
-    patientEmail: "neha.more@gmail.com",
-    doctorName: "Dr. Neha More",
-    date: "08 Sep 2026",
-    time: "01:00 PM",
-    status: "PENDING",
-  },
-  {
-    id: 7,
-    patientName: "Suresh More",
-    patientEmail: "suresh.more@gmail.com",
-    doctorName: "Dr. Vikram Singh",
-    date: "09 Sep 2026",
-    time: "03:30 PM",
-    status: "CONFIRMED",
-  },
-  {
-    id: 8,
-    patientName: "Kiran Shah",
-    patientEmail: "kiran.shah@gmail.com",
-    doctorName: "Dr. Rajesh Sharma",
-    date: "10 Sep 2026",
-    time: "11:00 AM",
-    status: "COMPLETED",
-  },
-];
+import type {
+  Appointment,
+  AppointmentStatus,
+} from "../../features/appointments/types";
+import { useGetAppointmentsQuery } from "../../features/appointments/appointmentApi";
+import { getApiErrorMessage } from "../../features/api/apiError";
 
 const getStatusColor = (
   status: AppointmentStatus,
-): "success" | "warning" | "error" | "default" => {
+): "success" | "warning" | "error" | "primary" | "default" => {
   switch (status) {
     case "CONFIRMED":
       return "success";
 
-    case "PENDING":
-      return "warning";
+    case "BOOKED":
+      return "primary";
 
     case "CANCELLED":
       return "error";
@@ -127,26 +48,58 @@ const getStatusColor = (
   }
 };
 
+const formatDate = (date: string): string => {
+  const parsedDate = new Date(`${date}T00:00:00`);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return date;
+  }
+
+  return parsedDate.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const formatTime = (time: string): string => {
+  const parsedTime = new Date(`1970-01-01T${time}`);
+
+  if (Number.isNaN(parsedTime.getTime())) {
+    return time;
+  }
+
+  return parsedTime.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
 const Appointments = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
+  const { data, isLoading, isError, error } = useGetAppointmentsQuery();
+
+  const appointments = data?.data.content ?? [];
+
   const filteredAppointments = useMemo(() => {
     const searchValue = search.toLowerCase().trim();
 
     if (!searchValue) {
-      return mockAppointments;
+      return appointments;
     }
 
-    return mockAppointments.filter(
+    return appointments.filter(
       (appointment) =>
         appointment.patientName.toLowerCase().includes(searchValue) ||
-        appointment.patientEmail.toLowerCase().includes(searchValue) ||
         appointment.doctorName.toLowerCase().includes(searchValue) ||
+        appointment.reason.toLowerCase().includes(searchValue) ||
         appointment.status.toLowerCase().includes(searchValue),
     );
-  }, [search]);
+  }, [search, appointments]);
 
   const paginatedAppointments = filteredAppointments.slice(
     page * rowsPerPage,
@@ -224,7 +177,7 @@ const Appointments = () => {
         <TextField
           fullWidth
           size="small"
-          placeholder="Search by patient, doctor, email or status"
+          placeholder="Search by patient, doctor, reason or status"
           value={search}
           onChange={handleSearchChange}
           slotProps={{
@@ -261,18 +214,32 @@ const Appointments = () => {
                 }}
               >
                 <TableCell>ID</TableCell>
-                <TableCell>Patient Name</TableCell>
-                <TableCell>Patient Email</TableCell>
+                <TableCell>Patient</TableCell>
                 <TableCell>Doctor</TableCell>
                 <TableCell>Date</TableCell>
                 <TableCell>Time</TableCell>
+                <TableCell>Reason</TableCell>
                 <TableCell align="center">Status</TableCell>
                 <TableCell align="center">Actions</TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {paginatedAppointments.length > 0 ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
+                    <CircularProgress size={32} />
+                  </TableCell>
+                </TableRow>
+              ) : isError ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
+                    <Typography color="error">
+                      {getApiErrorMessage(error)}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : paginatedAppointments.length > 0 ? (
                 paginatedAppointments.map((appointment) => (
                   <TableRow
                     key={appointment.id}
@@ -291,13 +258,17 @@ const Appointments = () => {
                       </Typography>
                     </TableCell>
 
-                    <TableCell>{appointment.patientEmail}</TableCell>
-
                     <TableCell>{appointment.doctorName}</TableCell>
 
-                    <TableCell>{appointment.date}</TableCell>
+                    <TableCell>
+                      {formatDate(appointment.appointmentDate)}
+                    </TableCell>
 
-                    <TableCell>{appointment.time}</TableCell>
+                    <TableCell>
+                      {formatTime(appointment.appointmentTime)}
+                    </TableCell>
+
+                    <TableCell>{appointment.reason}</TableCell>
 
                     <TableCell align="center">
                       <Chip
