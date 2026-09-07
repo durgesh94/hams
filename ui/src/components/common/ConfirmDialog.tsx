@@ -24,7 +24,7 @@ const ConfirmDialog = ({
   message,
   onClose,
   onConfirm,
-  confirmText = "Delete",
+  confirmText = "Confirm",
   cancelText = "Cancel",
   loading = false,
 }: ConfirmDialogProps) => {
@@ -52,7 +52,7 @@ const ConfirmDialog = ({
           variant="contained"
           disabled={loading}
         >
-          {loading ? "Deleting..." : confirmText}
+          {loading ? "In Progress..." : confirmText}
         </Button>
       </DialogActions>
     </Dialog>
