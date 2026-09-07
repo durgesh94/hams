@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectToken, selectUser } from "./authSelectors";
 
 import { logout, setCredentials } from "./authSlice";
+import { authStorage } from "./authStorage";
 
 import { useGetCurrentUserQuery } from "./authApi";
 
@@ -42,6 +43,33 @@ const AuthInitializer = ({ children }: AuthInitializerProps) => {
       dispatch(logout());
     }
   }, [isError, token, dispatch]);
+
+  useEffect(() => {
+    if (!token) {
+      return undefined;
+    }
+
+    const expirationTime = authStorage.getTokenExpirationTime(token);
+
+    if (!expirationTime) {
+      return undefined;
+    }
+
+    const timeUntilExpiration = expirationTime - Date.now();
+
+    if (timeUntilExpiration <= 0) {
+      dispatch(logout());
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      dispatch(logout());
+    }, timeUntilExpiration);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [token, dispatch]);
 
   if (token && !user && isLoading) {
     return null;

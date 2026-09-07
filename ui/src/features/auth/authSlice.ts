@@ -11,11 +11,18 @@ interface AuthState {
 
 const storedToken = authStorage.getToken();
 const storedUser = authStorage.getUser();
+const hasValidStoredToken = storedToken
+  ? !authStorage.isTokenExpired(storedToken)
+  : false;
+
+if (storedToken && !hasValidStoredToken) {
+  authStorage.clearAuth();
+}
 
 const initialState: AuthState = {
-  token: storedToken,
-  user: storedUser,
-  isAuthenticated: Boolean(storedToken),
+  token: hasValidStoredToken ? storedToken : null,
+  user: hasValidStoredToken ? storedUser : null,
+  isAuthenticated: hasValidStoredToken,
 };
 
 const authSlice = createSlice({
