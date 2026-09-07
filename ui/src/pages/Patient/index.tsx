@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 import { Add, Delete, Edit, Search, Visibility } from "@mui/icons-material";
 import {
+  Alert,
   Box,
   Button,
+  CircularProgress,
   IconButton,
   InputAdornment,
   Paper,
@@ -18,85 +20,59 @@ import {
   Typography,
 } from "@mui/material";
 
-interface Patient {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  dateOfBirth: string;
-}
+import { useGetPatientsQuery } from "../../features/patients/patientApi";
+import type { Patient as PatientType } from "../../features/patients/types";
 
-const mockPatients: Patient[] = [
-  {
-    id: 1,
-    name: "Rahul Kumar",
-    email: "rahul.kumar@gmail.com",
-    phone: "9876543210",
-    dateOfBirth: "15 Jan 1990",
-  },
-  {
-    id: 2,
-    name: "Priya Sharma",
-    email: "priya.sharma@gmail.com",
-    phone: "9876543211",
-    dateOfBirth: "20 Mar 1988",
-  },
-  {
-    id: 3,
-    name: "Amit Patil",
-    email: "amit.patil@gmail.com",
-    phone: "9876543212",
-    dateOfBirth: "08 Jul 1995",
-  },
-  {
-    id: 4,
-    name: "Sneha Deshmukh",
-    email: "sneha.deshmukh@gmail.com",
-    phone: "9876543213",
-    dateOfBirth: "12 Nov 1992",
-  },
-  {
-    id: 5,
-    name: "Vikram Joshi",
-    email: "vikram.joshi@gmail.com",
-    phone: "9876543214",
-    dateOfBirth: "25 Feb 1985",
-  },
-  {
-    id: 6,
-    name: "Neha Kulkarni",
-    email: "neha.kulkarni@gmail.com",
-    phone: "9876543215",
-    dateOfBirth: "03 May 1998",
-  },
-  {
-    id: 7,
-    name: "Suresh More",
-    email: "suresh.more@gmail.com",
-    phone: "9876543216",
-    dateOfBirth: "19 Sep 1979",
-  },
-];
-
-const Patient = () => {
+const PatientPage = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const {
+    data: patients = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useGetPatientsQuery();
+
+  const errorMessage = useMemo(() => {
+    if (!error) {
+      return "Unable to load patients. Please try again.";
+    }
+
+    if ("status" in error) {
+      const errorData = error.data;
+
+      if (
+        errorData &&
+        typeof errorData === "object" &&
+        "message" in errorData
+      ) {
+        return String(errorData.message);
+      }
+
+      return `Unable to load patients. Request failed with status ${error.status}.`;
+    }
+
+    return error.message ?? "Unable to load patients. Please try again.";
+  }, [error]);
 
   const filteredPatients = useMemo(() => {
     const searchValue = search.toLowerCase().trim();
 
     if (!searchValue) {
-      return mockPatients;
+      return patients;
     }
 
-    return mockPatients.filter(
+    return patients.filter(
       (patient) =>
-        patient.name.toLowerCase().includes(searchValue) ||
+        patient.firstName.toLowerCase().includes(searchValue) ||
+        patient.lastName.toLowerCase().includes(searchValue) ||
         patient.email.toLowerCase().includes(searchValue) ||
         patient.phone.includes(searchValue),
     );
-  }, [search]);
+  }, [patients, search]);
 
   const paginatedPatients = filteredPatients.slice(
     page * rowsPerPage,
@@ -123,15 +99,15 @@ const Patient = () => {
     console.log("Add patient");
   };
 
-  const handleView = (patient: Patient) => {
+  const handleView = (patient: PatientType) => {
     console.log("View patient:", patient);
   };
 
-  const handleEdit = (patient: Patient) => {
+  const handleEdit = (patient: PatientType) => {
     console.log("Edit patient:", patient);
   };
 
-  const handleDelete = (patient: Patient) => {
+  const handleDelete = (patient: PatientType) => {
     console.log("Delete patient:", patient);
   };
 
@@ -142,8 +118,14 @@ const Patient = () => {
         sx={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: { xs: "flex-start", sm: "center" },
-          flexDirection: { xs: "column", sm: "row" },
+          alignItems: {
+            xs: "flex-start",
+            sm: "center",
+          },
+          flexDirection: {
+            xs: "column",
+            sm: "row",
+          },
           gap: 2,
           mb: 3,
         }}
@@ -173,10 +155,10 @@ const Patient = () => {
       >
         <TextField
           fullWidth
-          size="small"
-          placeholder="Search by name, email or phone"
+          placeholder="Search by name, phone or email"
           value={search}
           onChange={handleSearchChange}
+          size="small"
           slotProps={{
             input: {
               startAdornment: (
@@ -212,15 +194,40 @@ const Patient = () => {
               >
                 <TableCell>ID</TableCell>
                 <TableCell>Patient Name</TableCell>
+                <TableCell>Gender</TableCell>
+                <TableCell>Date of Birth</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Phone</TableCell>
-                <TableCell>Date of Birth</TableCell>
                 <TableCell align="center">Actions</TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {paginatedPatients.length > 0 ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                    <CircularProgress size={28} />
+                    <Typography color="text.secondary" sx={{ mt: 2 }}>
+                      Loading patients...
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : isError ? (
+                <TableRow>
+                  <TableCell colSpan={5} sx={{ py: 4 }}>
+                    <Alert
+                      severity="error"
+                      action={
+                        <Button color="inherit" size="small" onClick={refetch}>
+                          Retry
+                        </Button>
+                      }
+                    >
+                      {errorMessage}
+                    </Alert>
+                  </TableCell>
+                </TableRow>
+              ) : paginatedPatients.length > 0 ? (
                 paginatedPatients.map((patient) => (
                   <TableRow
                     key={patient.id}
@@ -234,14 +241,16 @@ const Patient = () => {
                     <TableCell>{patient.id}</TableCell>
 
                     <TableCell>
-                      <Typography variant="body2">{patient.name}</Typography>
+                      <Typography>{patient.firstName} {patient.lastName}</Typography>
                     </TableCell>
 
+                    <TableCell>{patient.gender}</TableCell>
+
+                    <TableCell>{patient.dateOfBirth}</TableCell>
+                    
                     <TableCell>{patient.email}</TableCell>
 
                     <TableCell>{patient.phone}</TableCell>
-
-                    <TableCell>{patient.dateOfBirth}</TableCell>
 
                     <TableCell align="center">
                       <Tooltip title="View">
@@ -249,7 +258,7 @@ const Patient = () => {
                           size="small"
                           color="primary"
                           onClick={() => handleView(patient)}
-                          aria-label={`View ${patient.name}`}
+                          aria-label={`View ${patient.firstName}`}
                         >
                           <Visibility fontSize="small" />
                         </IconButton>
@@ -260,7 +269,7 @@ const Patient = () => {
                           size="small"
                           color="secondary"
                           onClick={() => handleEdit(patient)}
-                          aria-label={`Edit ${patient.name}`}
+                          aria-label={`Edit ${patient.firstName}`}
                         >
                           <Edit fontSize="small" />
                         </IconButton>
@@ -271,7 +280,7 @@ const Patient = () => {
                           size="small"
                           color="error"
                           onClick={() => handleDelete(patient)}
-                          aria-label={`Delete ${patient.name}`}
+                          aria-label={`Delete ${patient.firstName}`}
                         >
                           <Delete fontSize="small" />
                         </IconButton>
@@ -281,7 +290,7 @@ const Patient = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                  <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
                     <Typography color="text.secondary">
                       No patients found
                     </Typography>
@@ -292,18 +301,20 @@ const Patient = () => {
           </Table>
         </TableContainer>
 
-        <TablePagination
-          component="div"
-          count={filteredPatients.length}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[5, 10, 25]}
-        />
+        {!isLoading && !isError && (
+          <TablePagination
+            component="div"
+            count={filteredPatients.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[5, 10, 25]}
+          />
+        )}
       </Paper>
     </Box>
   );
 };
 
-export default Patient;
+export default PatientPage;
