@@ -1,32 +1,41 @@
-import { useMemo, useState } from "react";
-import { Add, Delete, Edit, Search, Visibility } from "@mui/icons-material";
-import {
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  IconButton,
-  InputAdornment,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { useState } from "react";
+import { Box } from "@mui/material";
 
-import { useGetPatientsQuery } from "../../features/patients/patientApi";
-import type { Patient as PatientType } from "../../features/patients/types";
+import AppDialog from "../../components/common/AppDialog";
+import PageHeader from "../../components/common/PageHeader";
+import AddForm from "../../components/patients/AddForm";
+import PatientTable from "../../components/patients/PatientTable";
+import UpdateForm from "../../components/patients/UpdateForm";
+import ViewDetails from "../../components/patients/ViewDetails";
+import {
+  useCreatePatientMutation,
+  useDeletePatientMutation,
+  useGetPatientsQuery,
+  useUpdatePatientMutation,
+} from "../../features/patients/patientApi";
+import type {
+  CreatePatientRequest,
+  Patient,
+  UpdatePatientRequest,
+} from "../../features/patients/types";
+import {
+  getDialogAction,
+  getDialogButtonLabel,
+  getPatientFormId,
+} from "../../utils/patient-utils";
+import ToastMessage from "../../components/common/ToastMessage";
 
 const PatientPage = () => {
-  const [search, setSearch] = useState("");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogContentId, setDialogContentId] = useState(0);
+  const [dialogTitle, setDialogTitle] = useState("");
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState<"success" | "error">(
+    "error",
+  );
 
   const {
     data: patients = [],
@@ -36,283 +45,173 @@ const PatientPage = () => {
     refetch,
   } = useGetPatientsQuery();
 
-  const errorMessage = useMemo(() => {
-    if (!error) {
-      return "Unable to load patients. Please try again.";
-    }
+  const [createPatient] = useCreatePatientMutation();
+  const [updatePatient] = useUpdatePatientMutation();
+  const [deletePatient] = useDeletePatientMutation();
 
-    if ("status" in error) {
-      const errorData = error.data;
+  const handleToastClose = () => {
+    setToastOpen(false);
+  };
 
-      if (
-        errorData &&
-        typeof errorData === "object" &&
-        "message" in errorData
-      ) {
-        return String(errorData.message);
+  const showErrorToast = (error: unknown) => {
+    let message = "An error occurred. Please try again.";
+
+    if (error && typeof error === "object") {
+      const err = error as Record<string, unknown>;
+      const data = err.data as Record<string, unknown> | undefined;
+
+      if (data?.message && typeof data.message === "string") {
+        message = data.message;
+      } else if (err.message && typeof err.message === "string") {
+        message = err.message;
       }
-
-      return `Unable to load patients. Request failed with status ${error.status}.`;
     }
 
-    return error.message ?? "Unable to load patients. Please try again.";
-  }, [error]);
-
-  const filteredPatients = useMemo(() => {
-    const searchValue = search.toLowerCase().trim();
-
-    if (!searchValue) {
-      return patients;
-    }
-
-    return patients.filter(
-      (patient) =>
-        patient.firstName.toLowerCase().includes(searchValue) ||
-        patient.lastName.toLowerCase().includes(searchValue) ||
-        patient.email.toLowerCase().includes(searchValue) ||
-        patient.phone.includes(searchValue),
-    );
-  }, [patients, search]);
-
-  const paginatedPatients = filteredPatients.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage,
-  );
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
-    setPage(0);
+    setToastMessage(message);
+    setToastSeverity("error");
+    setToastOpen(true);
   };
 
-  const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
+  const showSuccessToast = (message: string) => {
+    setToastMessage(message);
+    setToastSeverity("success");
+    setToastOpen(true);
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setRowsPerPage(Number.parseInt(event.target.value, 10));
-    setPage(0);
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
   };
 
   const handleAdd = () => {
-    console.log("Add patient");
+    setSelectedPatient(null);
+    setDialogTitle("Add Patient");
+    setDialogContentId(1);
+    setIsDialogOpen(true);
   };
 
-  const handleView = (patient: PatientType) => {
-    console.log("View patient:", patient);
+  const handleView = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setDialogTitle("View Patient");
+    setDialogContentId(4);
+    setIsDialogOpen(true);
   };
 
-  const handleEdit = (patient: PatientType) => {
-    console.log("Edit patient:", patient);
+  const handleEdit = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setDialogTitle("Edit Patient");
+    setDialogContentId(2);
+    setIsDialogOpen(true);
   };
 
-  const handleDelete = (patient: PatientType) => {
-    console.log("Delete patient:", patient);
+  const handleDelete = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setDialogTitle("Delete Patient");
+    setDialogContentId(3);
+    setIsDialogOpen(true);
+  };
+
+  const handleAddFormSubmit = async (data: CreatePatientRequest) => {
+    setIsSubmitting(true);
+
+    const result = await createPatient(data);
+
+    if (result.error) {
+      showErrorToast(result.error);
+    } else {
+      showSuccessToast("Patient added successfully");
+      setIsDialogOpen(false);
+    }
+
+    setIsSubmitting(false);
+  };
+
+  const handleUpdateFormSubmit = async (data: UpdatePatientRequest) => {
+    setIsSubmitting(true);
+
+    const result = await updatePatient(data);
+
+    if (result.error) {
+      showErrorToast(result.error);
+    } else {
+      showSuccessToast("Patient updated successfully");
+      setIsDialogOpen(false);
+    }
+
+    setIsSubmitting(false);
+  };
+
+  const handleDeleteConfirm = async () => {
+    setIsSubmitting(true);
+
+    if (selectedPatient?.id) {
+      const result = await deletePatient(selectedPatient.id);
+
+      if (result.error) {
+        showErrorToast(result.error);
+      } else {
+        showSuccessToast("Patient deleted successfully");
+        setIsDialogOpen(false);
+      }
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
     <Box>
-      {/* Page Header */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: {
-            xs: "flex-start",
-            sm: "center",
-          },
-          flexDirection: {
-            xs: "column",
-            sm: "row",
-          },
-          gap: 2,
-          mb: 3,
-        }}
+      <PageHeader
+        title="Patients"
+        subtitle="Manage hospital patients"
+        handleAction={handleAdd}
+        actionLabel="Add Patient"
+      />
+
+      <PatientTable
+        patients={patients}
+        isLoading={isLoading}
+        isError={isError}
+        error={error ?? null}
+        onRefetch={refetch}
+        onView={handleView}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+
+      <AppDialog
+        open={isDialogOpen}
+        title={dialogTitle}
+        onClose={handleDialogClose}
+        formId={getPatientFormId(dialogContentId)}
+        submitText={getDialogButtonLabel(dialogContentId)}
+        onSubmit={getDialogAction(
+          dialogContentId,
+          handleDeleteConfirm,
+          handleDialogClose,
+        )}
+        isSubmitting={isSubmitting}
       >
-        <Box>
-          <Typography variant="h4">Patients</Typography>
-
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Manage hospital patients
-          </Typography>
-        </Box>
-
-        <Button variant="contained" startIcon={<Add />} onClick={handleAdd}>
-          Add Patient
-        </Button>
-      </Box>
-
-      {/* Search */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 2,
-          mb: 2,
-          border: "1px solid",
-          borderColor: "divider",
-        }}
-      >
-        <TextField
-          fullWidth
-          placeholder="Search by name, phone or email"
-          value={search}
-          onChange={handleSearchChange}
-          size="small"
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search color="action" />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-      </Paper>
-
-      {/* Patient Table */}
-      <Paper
-        elevation={0}
-        sx={{
-          border: "1px solid",
-          borderColor: "divider",
-          overflow: "hidden",
-        }}
-      >
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow
-                sx={{
-                  backgroundColor: "primary.main",
-                  "& .MuiTableCell-head": {
-                    color: "primary.contrastText",
-                    fontWeight: 600,
-                  },
-                }}
-              >
-                <TableCell>ID</TableCell>
-                <TableCell>Patient Name</TableCell>
-                <TableCell>Gender</TableCell>
-                <TableCell>Date of Birth</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Phone</TableCell>
-                <TableCell align="center">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
-                    <CircularProgress size={28} />
-                    <Typography color="text.secondary" sx={{ mt: 2 }}>
-                      Loading patients...
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ) : isError ? (
-                <TableRow>
-                  <TableCell colSpan={5} sx={{ py: 4 }}>
-                    <Alert
-                      severity="error"
-                      action={
-                        <Button color="inherit" size="small" onClick={refetch}>
-                          Retry
-                        </Button>
-                      }
-                    >
-                      {errorMessage}
-                    </Alert>
-                  </TableCell>
-                </TableRow>
-              ) : paginatedPatients.length > 0 ? (
-                paginatedPatients.map((patient) => (
-                  <TableRow
-                    key={patient.id}
-                    hover
-                    sx={{
-                      "&:last-child td": {
-                        borderBottom: 0,
-                      },
-                    }}
-                  >
-                    <TableCell>{patient.id}</TableCell>
-
-                    <TableCell>
-                      <Typography>{patient.firstName} {patient.lastName}</Typography>
-                    </TableCell>
-
-                    <TableCell>{patient.gender}</TableCell>
-
-                    <TableCell>{patient.dateOfBirth}</TableCell>
-                    
-                    <TableCell>{patient.email}</TableCell>
-
-                    <TableCell>{patient.phone}</TableCell>
-
-                    <TableCell align="center">
-                      <Tooltip title="View">
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => handleView(patient)}
-                          aria-label={`View ${patient.firstName}`}
-                        >
-                          <Visibility fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-
-                      <Tooltip title="Edit">
-                        <IconButton
-                          size="small"
-                          color="secondary"
-                          onClick={() => handleEdit(patient)}
-                          aria-label={`Edit ${patient.firstName}`}
-                        >
-                          <Edit fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-
-                      <Tooltip title="Delete">
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => handleDelete(patient)}
-                          aria-label={`Delete ${patient.firstName}`}
-                        >
-                          <Delete fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
-                    <Typography color="text.secondary">
-                      No patients found
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        {!isLoading && !isError && (
-          <TablePagination
-            component="div"
-            count={filteredPatients.length}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 25]}
+        {dialogContentId === 1 && (
+          <AddForm onSubmit={handleAddFormSubmit} isSubmitting={isSubmitting} />
+        )}
+        {dialogContentId === 2 && (
+          <UpdateForm
+            patient={selectedPatient}
+            onSubmit={handleUpdateFormSubmit}
+            isSubmitting={isSubmitting}
           />
         )}
-      </Paper>
+        {dialogContentId === 3 && (
+          <Box>Do you want to delete {selectedPatient?.firstName}?</Box>
+        )}
+        {dialogContentId === 4 && <ViewDetails patient={selectedPatient} />}
+      </AppDialog>
+
+      <ToastMessage
+        toastOpen={toastOpen}
+        toastMessage={toastMessage}
+        toastSeverity={toastSeverity}
+        handleToastClose={handleToastClose}
+      />
     </Box>
   );
 };
