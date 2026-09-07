@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Snackbar, Alert } from "@mui/material";
+import { Box } from "@mui/material";
 import {
   useCreateDoctorMutation,
   useUpdateDoctorMutation,
@@ -17,7 +17,12 @@ import AddForm from "../../components/doctors/AddForm";
 import UpdateForm from "../../components/doctors/UpdateForm";
 import ViewDetails from "../../components/doctors/ViewDetails";
 import PageHeader from "../../components/common/PageHeader";
-import { getDialogAction, getDoctorFormId } from "../../utils/doctor-utils";
+import {
+  getDialogAction,
+  getDoctorFormId,
+  getDialogButtonLabel,
+} from "../../utils/doctor-utils";
+import ToastMessage from "../../components/common/ToastMessage";
 
 const DoctorPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -154,6 +159,7 @@ const DoctorPage = () => {
       <PageHeader
         title="Doctors"
         subtitle="Manage hospital doctors"
+        actionLabel="Add Doctor"
         handleAction={handleAdd}
       />
 
@@ -175,13 +181,7 @@ const DoctorPage = () => {
         title={dialogTitle}
         onClose={handleDialogClose}
         formId={getDoctorFormId(dialogContentId)}
-        submitText={
-          dialogContentId === 3
-            ? "Confirm"
-            : dialogContentId === 4
-              ? "Ok"
-              : "Save"
-        }
+        submitText={getDialogButtonLabel(dialogContentId)}
         onSubmit={getDialogAction(
           dialogContentId,
           handleDeleteConfirm,
@@ -206,20 +206,12 @@ const DoctorPage = () => {
       </AppDialog>
 
       {/* Toast Notification */}
-      <Snackbar
-        open={toastOpen}
-        autoHideDuration={6000}
-        onClose={handleToastClose}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleToastClose}
-          severity={toastSeverity}
-          sx={{ width: "100%" }}
-        >
-          {toastMessage}
-        </Alert>
-      </Snackbar>
+      <ToastMessage
+        toastOpen={toastOpen}
+        toastMessage={toastMessage}
+        toastSeverity={toastSeverity}
+        handleToastClose={handleToastClose}
+      />
     </Box>
   );
 };

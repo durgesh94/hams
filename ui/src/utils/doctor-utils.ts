@@ -25,3 +25,14 @@ export const getDialogAction = (
       return undefined;
   }
 };
+
+export const getDialogButtonLabel = (dialogContentId: number): string => {
+  switch (dialogContentId) {
+    case 3:
+      return "Confirm";
+    case 4:
+      return "Ok";
+    default:
+      return "Save";
+  }
+};
