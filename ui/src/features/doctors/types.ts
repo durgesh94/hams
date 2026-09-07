@@ -24,6 +24,7 @@ export interface CreateDoctorRequest {
   gender: string;
   phone: string;
   email: string;
+  status: DoctorStatus;
 }
 
 export interface UpdateDoctorRequest {
@@ -36,4 +37,5 @@ export interface UpdateDoctorRequest {
   gender: string;
   phone: string;
   email: string;
+  status: DoctorStatus;
 }

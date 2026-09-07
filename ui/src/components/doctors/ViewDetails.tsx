@@ -2,6 +2,7 @@ interface ViewDetailsProps {
   doctor: {
     firstName: string;
     lastName: string;
+    gender: string;
     specialization: string;
     qualification: string;
     phone: string;
@@ -20,6 +21,7 @@ const ViewDetails = ({ doctor }: ViewDetailsProps) => {
       <p>
         Name: {doctor.firstName} {doctor.lastName}
       </p>
+      <p>Gender: {doctor.gender.toLowerCase().charAt(0).toUpperCase() + doctor.gender.toLowerCase().slice(1)}</p>
       <p>Specialization: {doctor.specialization}</p>
       <p>Qualification: {doctor.qualification}</p>
       <p>Phone: {doctor.phone}</p>

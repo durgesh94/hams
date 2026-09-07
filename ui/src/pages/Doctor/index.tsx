@@ -1,6 +1,11 @@
 import { useState } from "react";
-import { Box } from "@mui/material";
-import { useGetDoctorsQuery } from "../../features/doctors/doctorApi";
+import { Box, Snackbar, Alert } from "@mui/material";
+import {
+  useCreateDoctorMutation,
+  useUpdateDoctorMutation,
+  useDeleteDoctorMutation,
+  useGetDoctorsQuery,
+} from "../../features/doctors/doctorApi";
 import type {
   CreateDoctorRequest,
   Doctor,
@@ -12,6 +17,7 @@ import AddForm from "../../components/doctors/AddForm";
 import UpdateForm from "../../components/doctors/UpdateForm";
 import ViewDetails from "../../components/doctors/ViewDetails";
 import PageHeader from "../../components/common/PageHeader";
+import { getDialogAction, getDoctorFormId } from "../../utils/doctor-utils";
 
 const DoctorPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -19,6 +25,11 @@ const DoctorPage = () => {
   const [dialogTitle, setDialogTitle] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState<"success" | "error">(
+    "error",
+  );
 
   const {
     data: doctors = [],
@@ -27,6 +38,38 @@ const DoctorPage = () => {
     error,
     refetch,
   } = useGetDoctorsQuery();
+
+  const [createDoctor] = useCreateDoctorMutation();
+  const [updateDoctor] = useUpdateDoctorMutation();
+  const [deleteDoctor] = useDeleteDoctorMutation();
+
+  const handleToastClose = () => {
+    setToastOpen(false);
+  };
+
+  const showErrorToast = (error: unknown) => {
+    let message = "An error occurred. Please try again.";
+
+    if (error && typeof error === "object") {
+      const err = error as Record<string, unknown>;
+      const data = err.data as Record<string, unknown> | undefined;
+      if (data?.message && typeof data.message === "string") {
+        message = data.message;
+      } else if (err.message && typeof err.message === "string") {
+        message = err.message;
+      }
+    }
+
+    setToastMessage(message);
+    setToastSeverity("error");
+    setToastOpen(true);
+  };
+
+  const showSuccessToast = (message: string) => {
+    setToastMessage(message);
+    setToastSeverity("success");
+    setToastOpen(true);
+  };
 
   const handleDialogClose = () => {
     setIsDialogOpen(false);
@@ -39,7 +82,6 @@ const DoctorPage = () => {
   };
 
   const handleView = (doctor: Doctor) => {
-    console.log("View doctor:", doctor);
     setSelectedDoctor(doctor);
     setDialogTitle("View Doctor");
     setDialogContentId(4);
@@ -47,7 +89,6 @@ const DoctorPage = () => {
   };
 
   const handleEdit = (doctor: Doctor) => {
-    console.log("Edit doctor:", doctor);
     setSelectedDoctor(doctor);
     setDialogTitle("Edit Doctor");
     setDialogContentId(2);
@@ -55,41 +96,56 @@ const DoctorPage = () => {
   };
 
   const handleDelete = (doctor: Doctor) => {
-    console.log("Delete doctor:", doctor);
     setSelectedDoctor(doctor);
     setDialogTitle("Delete Doctor");
     setDialogContentId(3);
     setIsDialogOpen(true);
   };
 
-  const handleAddFormSubmit = (data: CreateDoctorRequest) => {
+  const handleAddFormSubmit = async (data: CreateDoctorRequest) => {
     setIsSubmitting(true);
-    console.log("Adding doctor:", data);
-    // TODO: Call create doctor API
-    setTimeout(() => {
-      setIsSubmitting(false);
+
+    const result = await createDoctor(data);
+
+    if (result.error) {
+      showErrorToast(result.error);
+    } else {
+      showSuccessToast("Doctor added successfully");
       setIsDialogOpen(false);
-    }, 1000);
+    }
+
+    setIsSubmitting(false);
   };
 
-  const handleUpdateFormSubmit = (data: UpdateDoctorRequest) => {
+  const handleUpdateFormSubmit = async (data: UpdateDoctorRequest) => {
     setIsSubmitting(true);
-    console.log("Updating doctor:", data);
-    // TODO: Call update doctor API
-    setTimeout(() => {
-      setIsSubmitting(false);
+    const result = await updateDoctor(data);
+
+    if (result.error) {
+      showErrorToast(result.error);
+    } else {
+      showSuccessToast("Doctor updated successfully");
       setIsDialogOpen(false);
-    }, 1000);
+    }
+
+    setIsSubmitting(false);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     setIsSubmitting(true);
-    console.log("Deleting doctor:", selectedDoctor?.id);
-    // TODO: Call delete doctor API
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsDialogOpen(false);
-    }, 1000);
+
+    if (selectedDoctor?.id) {
+      const result = await deleteDoctor(selectedDoctor.id);
+
+      if (result.error) {
+        showErrorToast(result.error);
+      } else {
+        showSuccessToast("Doctor deleted successfully");
+        setIsDialogOpen(false);
+      }
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -118,13 +174,7 @@ const DoctorPage = () => {
         open={isDialogOpen}
         title={dialogTitle}
         onClose={handleDialogClose}
-        formId={
-          dialogContentId === 1
-            ? "add-doctor-form"
-            : dialogContentId === 2
-              ? "update-doctor-form"
-              : undefined
-        }
+        formId={getDoctorFormId(dialogContentId)}
         submitText={
           dialogContentId === 3
             ? "Confirm"
@@ -132,13 +182,11 @@ const DoctorPage = () => {
               ? "Ok"
               : "Save"
         }
-        onSubmit={
-          dialogContentId === 3
-            ? handleDeleteConfirm
-            : dialogContentId === 4
-              ? handleDialogClose
-              : undefined
-        }
+        onSubmit={getDialogAction(
+          dialogContentId,
+          handleDeleteConfirm,
+          handleDialogClose,
+        )}
         isSubmitting={isSubmitting}
       >
         {dialogContentId === 1 && (
@@ -156,6 +204,22 @@ const DoctorPage = () => {
         )}
         {dialogContentId === 4 && <ViewDetails doctor={selectedDoctor} />}
       </AppDialog>
+
+      {/* Toast Notification */}
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={6000}
+        onClose={handleToastClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleToastClose}
+          severity={toastSeverity}
+          sx={{ width: "100%" }}
+        >
+          {toastMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

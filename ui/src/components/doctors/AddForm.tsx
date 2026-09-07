@@ -149,6 +149,7 @@ const DoctorForm = ({
       experienceYears: data.experienceYears,
       email: data.email.trim(),
       phone: data.phone.trim(),
+      status: data.status,
     });
   };
 
