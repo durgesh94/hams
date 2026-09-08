@@ -1,47 +1,32 @@
-import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
+import { Box, Grid } from "@mui/material";
+import PageHeader from "../../components/common/PageHeader";
+import Card from "../../components/common/Card";
 
 const Dashboard = () => {
   return (
-    <Box>
-      <Box sx={{ mb: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }} >
-        <Typography variant="h4" sx={{ mb: 3 }}>
-          Dashboard
-        </Typography>
-        <Typography variant="h6" sx={{ mb: 3 }}>
-          {new Date().toLocaleString("default", { month: "long" })} {new Date().getFullYear()}
-        </Typography>
-      </Box>
+    <Box sx={{ flexGrow: 1 }}>
+      <PageHeader
+        title="Dashboard"
+        subtitle="Overview of hospital management system"
+        rightLabel={`${new Date().toLocaleString("default", { month: "long" })} ${new Date().getFullYear()}`}
+      />
 
       <Grid container spacing={3}>
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Doctors</Typography>
-
-              <Typography variant="h3">12</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Patients</Typography>
-
-              <Typography variant="h3">45</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Appointments</Typography>
-
-              <Typography variant="h3">128</Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+        <Card
+          title="Doctors"
+          count={12}
+          description="Active Doctors in this month"
+        />
+        <Card
+          title="Patients"
+          count={45}
+          description="Patients newly registered in this month"
+        />
+        <Card
+          title="Appointments"
+          count={128}
+          description="Scheduled Appointments in this month"
+        />
       </Grid>
     </Box>
   );

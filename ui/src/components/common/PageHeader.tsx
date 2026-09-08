@@ -5,12 +5,14 @@ const PageHeader = ({
   title,
   subtitle,
   handleAction,
-  actionLabel = "+ Add",
+  actionLabel,
+  rightLabel,
 }: {
   title: string;
   subtitle?: string;
-  handleAction: () => void;
+  handleAction?: () => void;
   actionLabel?: string;
+  rightLabel?: string;
 }) => {
   return (
     <Box
@@ -32,10 +34,16 @@ const PageHeader = ({
           </Typography>
         )}
       </Box>
-
-      <Button variant="contained" startIcon={<Add />} onClick={handleAction}>
-        {actionLabel}
-      </Button>
+      {actionLabel && (
+        <Button variant="contained" startIcon={<Add />} onClick={handleAction}>
+          {actionLabel}
+        </Button>
+      )}
+      {rightLabel && (
+        <Typography variant="h6" sx={{ mb: 3 }}>
+          {rightLabel}
+        </Typography>
+      )}
     </Box>
   );
 };
