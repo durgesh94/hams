@@ -14,6 +14,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import { useAppDispatch } from "../../app/hooks";
+import { baseApi } from "../../features/api/baseApi";
 import { setCredentials } from "../../features/auth/authSlice";
 import { useLoginMutation } from "../../features/auth/authApi";
 
@@ -44,6 +45,7 @@ const Login = () => {
         password,
       }).unwrap();
 
+      dispatch(baseApi.util.resetApiState());
       dispatch(
         setCredentials({
           token: response.token,
