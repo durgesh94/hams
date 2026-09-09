@@ -28,6 +28,8 @@ import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentRe
 import com.hams.hospital_appointment_system.module.appointment.entity.AppointmentStatus;
 import com.hams.hospital_appointment_system.module.appointment.service.AppointmentService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1/appointments")
 @RequiredArgsConstructor
@@ -37,7 +39,7 @@ public class AppointmentController {
 
         @PostMapping
         public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment(
-                        @RequestBody AppointmentRequest request) {
+                        @Valid @RequestBody AppointmentRequest request) {
                 AppointmentResponse response = appointmentService.createAppointment(request);
                 ApiResponse<AppointmentResponse> apiResponse = ApiResponse.<AppointmentResponse>builder()
                                 .status(HttpStatus.CREATED.value())
@@ -64,7 +66,7 @@ public class AppointmentController {
         @PutMapping("/{id}")
         public ResponseEntity<ApiResponse<AppointmentResponse>> updateAppointment(
                         @PathVariable("id") Long appointmentId,
-                        @RequestBody AppointmentRequest request) {
+                        @Valid @RequestBody AppointmentRequest request) {
                 AppointmentResponse response = appointmentService.updateAppointment(appointmentId, request);
                 ApiResponse<AppointmentResponse> apiResponse = ApiResponse.<AppointmentResponse>builder()
                                 .status(HttpStatus.OK.value())

@@ -20,6 +20,8 @@ import com.hams.hospital_appointment_system.module.doctor.dto.DoctorResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.hams.hospital_appointment_system.module.doctor.service.DoctorService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -42,7 +44,7 @@ public class DoctorController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<DoctorResponse>> createDoctor(@RequestBody DoctorRequest doctorRequest) {
+    public ResponseEntity<ApiResponse<DoctorResponse>> createDoctor(@Valid @RequestBody DoctorRequest doctorRequest) {
         DoctorResponse doctorResponse = doctorService.createDoctor(doctorRequest);
 
         ApiResponse<DoctorResponse> response = ApiResponse.<DoctorResponse>builder()
@@ -69,7 +71,7 @@ public class DoctorController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<DoctorResponse>> updateDoctor(@PathVariable Long id,
-            @RequestBody DoctorRequest doctorRequest) {
+            @Valid @RequestBody DoctorRequest doctorRequest) {
         DoctorResponse doctorResponse = doctorService.updateDoctor(id, doctorRequest);
 
         ApiResponse<DoctorResponse> response = ApiResponse.<DoctorResponse>builder()

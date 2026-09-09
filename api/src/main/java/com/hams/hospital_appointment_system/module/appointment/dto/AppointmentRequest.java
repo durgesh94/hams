@@ -27,10 +27,10 @@ public class AppointmentRequest {
     private Long doctorId;
 
     @NotNull(message = "Appointment date is required")
+    @FutureOrPresent(message = "Appointment date cannot be in the past")
     private LocalDate appointmentDate;
 
-    @NotNull(message = "Appointment date is required")
-    @FutureOrPresent(message = "Appointment date cannot be in the past")
+    @NotNull(message = "Appointment time is required")
     private LocalTime appointmentTime;
 
     @Size(max = 500, message = "Reason must not exceed 500 characters")
