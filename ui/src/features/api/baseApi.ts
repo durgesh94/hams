@@ -45,7 +45,7 @@ export const baseApi = createApi({
 
   baseQuery: baseQueryWithAuth,
 
-  tagTypes: ["Doctor", "Patient", "Appointment", "Auth"],
+  tagTypes: ["Doctor", "Patient", "Appointment", "Auth", "Dashboard"],
 
   endpoints: () => ({}),
 });

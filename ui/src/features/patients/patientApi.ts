@@ -1,15 +1,10 @@
 import { baseApi } from "../api/baseApi";
+import type { ApiResponse } from "../api/types";
 import type {
   CreatePatientRequest,
   Patient,
   UpdatePatientRequest,
 } from "./types";
-
-type ApiResponse<T> = {
-  status: number;
-  message: string;
-  data: T;
-};
 
 export const patientApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
