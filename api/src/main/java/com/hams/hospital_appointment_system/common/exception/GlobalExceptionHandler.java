@@ -1,14 +1,19 @@
 package com.hams.hospital_appointment_system.common.exception;
 
 import com.hams.hospital_appointment_system.common.response.ErrorResponse;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -120,6 +125,67 @@ public class GlobalExceptionHandler {
 
                 return ResponseEntity
                                 .status(HttpStatus.CONFLICT)
+                                .body(errorResponse);
+        }
+
+        @ExceptionHandler(DataIntegrityViolationException.class)
+        public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
+                        DataIntegrityViolationException exception) {
+
+                ErrorResponse errorResponse = ErrorResponse.builder()
+                                .status(HttpStatus.CONFLICT.value())
+                                .message("Unable to process the request due to a data constraint.")
+                                .timestamp(LocalDateTime.now())
+                                .build();
+
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(errorResponse);
+        }
+
+        @ExceptionHandler(AccessDeniedException.class)
+        public ResponseEntity<ErrorResponse> handleAccessDenied(
+                        AccessDeniedException exception) {
+
+                ErrorResponse errorResponse = ErrorResponse.builder()
+                                .status(HttpStatus.FORBIDDEN.value())
+                                .message("You do not have permission to perform this action.")
+                                .timestamp(LocalDateTime.now())
+                                .build();
+
+                return ResponseEntity
+                                .status(HttpStatus.FORBIDDEN)
+                                .body(errorResponse);
+        }
+
+        @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+        public ResponseEntity<ErrorResponse> handleMethodNotSupported(
+                        HttpRequestMethodNotSupportedException exception) {
+
+                ErrorResponse errorResponse = ErrorResponse.builder()
+                                .status(HttpStatus.METHOD_NOT_ALLOWED.value())
+                                .message("HTTP method '" + exception.getMethod()
+                                                + "' is not supported for this endpoint.")
+                                .timestamp(LocalDateTime.now())
+                                .build();
+
+                return ResponseEntity
+                                .status(HttpStatus.METHOD_NOT_ALLOWED)
+                                .body(errorResponse);
+        }
+
+        @ExceptionHandler(NoResourceFoundException.class)
+        public ResponseEntity<ErrorResponse> handleNoResourceFound(
+                        NoResourceFoundException exception) {
+
+                ErrorResponse errorResponse = ErrorResponse.builder()
+                                .status(HttpStatus.NOT_FOUND.value())
+                                .message("The requested resource or endpoint was not found.")
+                                .timestamp(LocalDateTime.now())
+                                .build();
+
+                return ResponseEntity
+                                .status(HttpStatus.NOT_FOUND)
                                 .body(errorResponse);
         }
 }
