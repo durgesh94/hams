@@ -1,6 +1,7 @@
 package com.hams.hospital_appointment_system.module.doctor.entity;
 
 import com.hams.hospital_appointment_system.common.enums.Gender;
+import com.hams.hospital_appointment_system.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Doctor {
+public class Doctor extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

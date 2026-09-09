@@ -3,9 +3,9 @@ package com.hams.hospital_appointment_system.module.patient.entity;
 import java.time.LocalDate;
 
 import com.hams.hospital_appointment_system.common.enums.Gender;
+import com.hams.hospital_appointment_system.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
 
 @Entity
 @Table(name = "patients")
@@ -14,7 +14,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Patient {
+public class Patient extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
