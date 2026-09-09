@@ -3,6 +3,8 @@ package com.hams.hospital_appointment_system.modules.doctor.service;
 import com.hams.hospital_appointment_system.common.enums.Gender;
 import com.hams.hospital_appointment_system.common.exception.DuplicateResourceException;
 import com.hams.hospital_appointment_system.common.exception.ResourceNotFoundException;
+import com.hams.hospital_appointment_system.module.appointment.entity.Appointment;
+import com.hams.hospital_appointment_system.module.appointment.repository.AppointmentRepository;
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorFilterRequest;
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorRequest;
 import com.hams.hospital_appointment_system.module.doctor.dto.DoctorResponse;
@@ -31,6 +33,9 @@ class DoctorServiceTest {
 
         @Mock
         private DoctorRepository doctorRepository;
+
+        @Mock
+        private AppointmentRepository appointmentRepository;
 
         @InjectMocks
         private DoctorServiceImpl doctorService;

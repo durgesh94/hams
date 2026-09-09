@@ -7,6 +7,8 @@ import com.hams.hospital_appointment_system.module.auth.controller.AuthControlle
 import com.hams.hospital_appointment_system.module.auth.dto.LoginRequest;
 import com.hams.hospital_appointment_system.module.auth.dto.LoginResponse;
 import com.hams.hospital_appointment_system.module.auth.service.AuthService;
+import com.hams.hospital_appointment_system.module.user.service.UserService;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -38,6 +40,9 @@ class AuthControllerTest {
 
         @MockitoBean
         private JwtService jwtService;
+
+        @MockitoBean 
+        private UserService userService;
 
         @MockitoBean
         private CustomUserDetailsService customUserDetailsService;
