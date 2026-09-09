@@ -36,6 +36,7 @@ interface DoctorTableProps {
   isLoading: boolean;
   isError: boolean;
   error: ApiError | null;
+  isAdmin: boolean;
   onRefetch: () => void;
   onView: (doctor: Doctor) => void;
   onEdit: (doctor: Doctor) => void;
@@ -47,6 +48,7 @@ const DoctorTable = ({
   isLoading,
   isError,
   error,
+  isAdmin = false,
   onRefetch,
   onView,
   onEdit,
@@ -193,7 +195,11 @@ const DoctorTable = ({
                     <Alert
                       severity="error"
                       action={
-                        <Button color="inherit" size="small" onClick={onRefetch}>
+                        <Button
+                          color="inherit"
+                          size="small"
+                          onClick={onRefetch}
+                        >
                           Retry
                         </Button>
                       }
@@ -246,28 +252,31 @@ const DoctorTable = ({
                           <Visibility fontSize="small" />
                         </IconButton>
                       </Tooltip>
+                      {isAdmin && (
+                        <Tooltip title="Edit">
+                          <IconButton
+                            size="small"
+                            color="secondary"
+                            onClick={() => onEdit(doctor)}
+                            aria-label={`Edit ${doctor.firstName}`}
+                          >
+                            <Edit fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
 
-                      <Tooltip title="Edit">
-                        <IconButton
-                          size="small"
-                          color="secondary"
-                          onClick={() => onEdit(doctor)}
-                          aria-label={`Edit ${doctor.firstName}`}
-                        >
-                          <Edit fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-
-                      <Tooltip title="Delete">
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => onDelete(doctor)}
-                          aria-label={`Delete ${doctor.firstName}`}
-                        >
-                          <Delete fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                      {isAdmin && (
+                        <Tooltip title="Delete">
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => onDelete(doctor)}
+                            aria-label={`Delete ${doctor.firstName}`}
+                          >
+                            <Delete fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 
 import AppDialog from "../../components/common/AppDialog";
@@ -24,6 +25,7 @@ import {
   getPatientFormId,
 } from "../../utils/patient-utils";
 import ToastMessage from "../../components/common/ToastMessage";
+import { selectIsAdmin } from "../../features/auth/authSelectors";
 
 const PatientPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -36,6 +38,7 @@ const PatientPage = () => {
   const [toastSeverity, setToastSeverity] = useState<"success" | "error">(
     "error",
   );
+  const isAdmin = useSelector(selectIsAdmin);
 
   const {
     data: patients = [],
@@ -164,6 +167,7 @@ const PatientPage = () => {
         subtitle="Manage hospital patients"
         handleAction={handleAdd}
         actionLabel="Add Patient"
+        isAdmin={isAdmin}
       />
 
       <PatientTable
@@ -171,6 +175,7 @@ const PatientPage = () => {
         isLoading={isLoading}
         isError={isError}
         error={error ?? null}
+        isAdmin={isAdmin}
         onRefetch={refetch}
         onView={handleView}
         onEdit={handleEdit}

@@ -23,6 +23,8 @@ import {
   getDialogButtonLabel,
 } from "../../utils/doctor-utils";
 import ToastMessage from "../../components/common/ToastMessage";
+import { selectIsAdmin } from "../../features/auth/authSelectors";
+import { useSelector } from "react-redux";
 
 const DoctorPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -35,6 +37,7 @@ const DoctorPage = () => {
   const [toastSeverity, setToastSeverity] = useState<"success" | "error">(
     "error",
   );
+  const isAdmin = useSelector(selectIsAdmin);
 
   const {
     data: doctors = [],
@@ -161,6 +164,7 @@ const DoctorPage = () => {
         subtitle="Manage hospital doctors"
         actionLabel="Add Doctor"
         handleAction={handleAdd}
+        isAdmin={isAdmin}
       />
 
       {/* Doctor Table */}
@@ -169,6 +173,7 @@ const DoctorPage = () => {
         isLoading={isLoading}
         isError={isError}
         error={error}
+        isAdmin={isAdmin}
         onRefetch={refetch}
         onView={handleView}
         onEdit={handleEdit}

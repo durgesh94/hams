@@ -7,12 +7,14 @@ const PageHeader = ({
   handleAction,
   actionLabel,
   rightLabel,
+  isAdmin,
 }: {
   title: string;
   subtitle?: string;
   handleAction?: () => void;
   actionLabel?: string;
   rightLabel?: string;
+  isAdmin?: boolean;
 }) => {
   return (
     <Box
@@ -34,7 +36,7 @@ const PageHeader = ({
           </Typography>
         )}
       </Box>
-      {actionLabel && (
+      {actionLabel && isAdmin && (
         <Button variant="contained" startIcon={<Add />} onClick={handleAction}>
           {actionLabel}
         </Button>

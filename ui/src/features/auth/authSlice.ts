@@ -6,6 +6,7 @@ import type { User } from "./types";
 interface AuthState {
   token: string | null;
   user: User | null;
+  role: string | null;
   isAuthenticated: boolean;
 }
 
@@ -22,6 +23,7 @@ if (storedToken && !hasValidStoredToken) {
 const initialState: AuthState = {
   token: hasValidStoredToken ? storedToken : null,
   user: hasValidStoredToken ? storedUser : null,
+  role: hasValidStoredToken && storedUser ? storedUser.role : null,
   isAuthenticated: hasValidStoredToken,
 };
 
@@ -40,6 +42,7 @@ const authSlice = createSlice({
     ) => {
       state.token = action.payload.token;
       state.user = action.payload.user;
+      state.role = action.payload.user.role;
       state.isAuthenticated = true;
 
       authStorage.setAuth(action.payload.token, action.payload.user);
@@ -48,6 +51,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.token = null;
       state.user = null;
+      state.role = null;
       state.isAuthenticated = false;
 
       authStorage.clearAuth();

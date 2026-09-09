@@ -26,6 +26,8 @@ import {
   getDialogAction,
   getDialogButtonLabel,
 } from "../../utils/appointment-utils";
+import { useSelector } from "react-redux";
+import { selectIsAdmin } from "../../features/auth/authSelectors";
 
 const Appointments = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -39,6 +41,7 @@ const Appointments = () => {
   const [toastSeverity, setToastSeverity] = useState<"success" | "error">(
     "error",
   );
+  const isAdmin = useSelector(selectIsAdmin);
 
   const {
     data: appointments = [],
@@ -170,6 +173,7 @@ const Appointments = () => {
         subtitle="Manage hospital appointments"
         actionLabel="Add Appointment"
         handleAction={handleAdd}
+        isAdmin={isAdmin}
       />
 
       <AppointmentTable
@@ -177,6 +181,7 @@ const Appointments = () => {
         isLoading={isLoading}
         isError={isError}
         error={error}
+        isAdmin={isAdmin}
         onRefetch={refetch}
         onView={handleView}
         onEdit={handleEdit}
