@@ -20,7 +20,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import type { Doctor } from "../../features/doctors/types";
+import type { Doctor, DoctorStatus } from "../../features/doctors/types";
 
 type ApiError =
   | {
@@ -118,6 +118,21 @@ const DoctorTable = ({
     setPage(0);
   };
 
+  const getStatusColor = (
+    status: DoctorStatus,
+  ): "success" | "warning" | "error" | "default" => {
+    switch (status) {
+      case "ACTIVE":
+        return "success";
+      case "INACTIVE":
+        return "warning";
+      case "ON_LEAVE":
+        return "error";
+      default:
+        return "default";
+    }
+  };
+
   return (
     <Box>
       {/* Search */}
@@ -174,6 +189,7 @@ const DoctorTable = ({
                 <TableCell>Specialization</TableCell>
                 <TableCell>Qualification</TableCell>
                 <TableCell>Phone</TableCell>
+                <TableCell>Status</TableCell>
                 <TableCell align="center">Appointments</TableCell>
                 <TableCell align="center">Actions</TableCell>
               </TableRow>
@@ -232,6 +248,15 @@ const DoctorTable = ({
                     <TableCell>{doctor.qualification}</TableCell>
 
                     <TableCell>{doctor.phone}</TableCell>
+
+                    <TableCell>
+                      <Chip
+                        label={doctor.status}
+                        color={getStatusColor(doctor.status)}
+                        size="small"
+                        sx={{ fontWeight: 500, minWidth: 90 }}
+                      />
+                    </TableCell>
 
                     <TableCell align="center">
                       <Chip

@@ -66,7 +66,7 @@ const updateDoctorSchema = z.object({
     .trim()
     .regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit mobile number"),
 
-  status: z.enum(["ACTIVE", "INACTIVE"], {
+  status: z.enum(["ACTIVE", "INACTIVE", "ON_LEAVE"], {
     message: "Please select status",
   }),
 });
@@ -120,7 +120,7 @@ const UpdateForm = ({
         experienceYears: doctor.experienceYears,
         email: doctor.email,
         phone: doctor.phone,
-        status: (doctor.status === "ACTIVE" || doctor.status === "INACTIVE")
+        status: (doctor.status === "ACTIVE" || doctor.status === "INACTIVE" || doctor.status === "ON_LEAVE")
           ? doctor.status
           : "ACTIVE",
       });
@@ -139,7 +139,7 @@ const UpdateForm = ({
         experienceYears: data.experienceYears,
         email: data.email.trim(),
         phone: data.phone.trim(),
-        status: data.status as "ACTIVE" | "INACTIVE",
+        status: data.status as "ACTIVE" | "INACTIVE" | "ON_LEAVE",
       });
     }
   };
@@ -294,13 +294,14 @@ const UpdateForm = ({
           value={status}
           label="Status"
           onChange={(event) => {
-            setValue("status", event.target.value as "ACTIVE" | "INACTIVE", {
+            setValue("status", event.target.value as "ACTIVE" | "INACTIVE" | "ON_LEAVE", {
               shouldValidate: true,
             });
           }}
         >
           <MenuItem value="ACTIVE">Active</MenuItem>
           <MenuItem value="INACTIVE">Inactive</MenuItem>
+          <MenuItem value="ON_LEAVE">On Leave</MenuItem>
         </Select>
 
         <FormHelperText>{errors.status?.message}</FormHelperText>
