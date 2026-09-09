@@ -44,12 +44,11 @@ export const appointmentApi = baseApi.injectEndpoints({
       ],
     }),
 
-    deleteAppointment: builder.mutation<null, number>({
+    deleteAppointment: builder.mutation<VoidFunction, number>({
       query: (id) => ({
         url: `/api/v1/appointments/${id}`,
         method: "DELETE",
       }),
-      transformResponse: (response: ApiResponse<null>) => response.data,
       invalidatesTags: ["Appointment"],
     }),
   }),

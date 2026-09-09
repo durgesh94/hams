@@ -23,4 +23,6 @@ public interface AppointmentService {
 
     List<AppointmentResponse> getAppointmentsList();
 
+    Void deleteAppointment(Long appointmentId);
+
 }

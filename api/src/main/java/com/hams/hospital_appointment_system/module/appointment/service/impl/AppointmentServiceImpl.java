@@ -134,4 +134,14 @@ public class AppointmentServiceImpl implements AppointmentService {
                                 .map(AppointmentMapper::toDto)
                                 .collect(Collectors.toList());
         }
+
+        @Override
+        public Void deleteAppointment(Long appointmentId) {
+                Appointment appointment = appointmentRepository.findById(appointmentId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Appointment not found with id " + appointmentId));
+
+                appointmentRepository.delete(appointment);
+                return null;
+        }
 }

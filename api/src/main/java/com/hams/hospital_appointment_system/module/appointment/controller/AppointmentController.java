@@ -12,7 +12,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -115,5 +117,11 @@ public class AppointmentController {
                                 .timestamp(LocalDateTime.now())
                                 .build();
                 return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+        }
+
+        @DeleteMapping("/{id}")
+        public ResponseEntity<Void> deleteAppointment(@PathVariable("id") Long appointmentId) {
+                appointmentService.deleteAppointment(appointmentId);
+                return ResponseEntity.noContent().build();
         }
 }
