@@ -58,7 +58,7 @@ const Dashboard = () => {
           <Button onClick={refetch}>Retry</Button>
         </Box>
       )}
-      {dashboardData && (
+      {dashboardData && !isLoading && !isError && (
         <Grid container spacing={3}>
           <Card
             title="Doctors"
