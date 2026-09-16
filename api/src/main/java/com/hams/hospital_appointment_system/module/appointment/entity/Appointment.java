@@ -51,6 +51,9 @@ public class Appointment {
     @Column(name = "appointment_time", nullable = false)
     private LocalTime appointmentTime;
 
+    @Column(name = "appointment_end_time", nullable = false)
+    private LocalTime appointmentEndTime;
+
     @Column(nullable = true, length = 500)
     private String reason;
 

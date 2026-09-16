@@ -50,29 +50,46 @@ public class AppointmentServiceImpl implements AppointmentService {
                 // Step 2: Check doctor status
                 if (doctor.getStatus() != DoctorStatus.ACTIVE) {
                         throw new AppointmentSlotAlreadyBookedException(
-                                        "Doctor with id " + request.getDoctorId() + " is not available");
+                                        "Dr. " + doctor.getFirstName() + " " + doctor.getLastName()
+                                                        + " is not available");
                 }
 
-                // Step 3: Check if the doctor is available at the requested appointment date
-                boolean alreadyBooked = appointmentRepository
-                                .existsByDoctorIdAndAppointmentDateAndAppointmentTimeAndStatusIn(
+                // Step 3: Check if the doctor is available at the requested appointment date &
+                // time slot
+                boolean doctorAlreadyBooked = appointmentRepository
+                                .existsDoctorOverlappingAppointment(
                                                 request.getDoctorId(),
                                                 request.getAppointmentDate(),
                                                 request.getAppointmentTime(),
+                                                request.getAppointmentTime().plusMinutes(30),
                                                 List.of(AppointmentStatus.BOOKED, AppointmentStatus.CONFIRMED));
-                if (alreadyBooked) {
+                if (doctorAlreadyBooked) {
                         throw new AppointmentSlotAlreadyBookedException(
-                                        "Doctor with id " + request.getDoctorId()
-                                                        + " is not available at the requested appointment date");
+                                        "Dr. " + doctor.getFirstName() + " " + doctor.getLastName()
+                                                        + " is not available at the requested appointment date and time slot");
                 }
 
-                // Step 4: Create the appointment entity
+                // Step 4: Check if the patient has overlapping appointments at the requested
+                // appointment date & time slot
+                boolean patientAlreadyBooked = appointmentRepository
+                                .existsPatientOverlappingAppointment(
+                                                request.getPatientId(),
+                                                request.getAppointmentDate(),
+                                                request.getAppointmentTime(),
+                                                request.getAppointmentTime().plusMinutes(30),
+                                                List.of(AppointmentStatus.BOOKED, AppointmentStatus.CONFIRMED));
+                if (patientAlreadyBooked) {
+                        throw new AppointmentSlotAlreadyBookedException(
+                                        "Patient is not available at the requested appointment date and time slot");
+                }
+
+                // Step 5: Create the appointment entity
                 Appointment appointment = AppointmentMapper.toEntity(request, doctor, patient);
 
-                // Step 5: Save the appointment entity to the database
+                // Step 6: Save the appointment entity to the database
                 appointment = appointmentRepository.save(appointment);
 
-                // Step 6: Convert the saved appointment entity to a response DTO
+                // Step 7: Convert the saved appointment entity to a response DTO
                 return AppointmentMapper.toDto(appointment);
         }
 

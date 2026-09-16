@@ -36,6 +36,7 @@ public class AppointmentMapper {
                 .patient(patient)
                 .appointmentDate(request.getAppointmentDate())
                 .appointmentTime(request.getAppointmentTime())
+                .appointmentEndTime(request.getAppointmentTime().plusMinutes(30))
                 .reason(request.getReason())
                 .notes(request.getNotes())
                 .status(AppointmentStatus.BOOKED)
