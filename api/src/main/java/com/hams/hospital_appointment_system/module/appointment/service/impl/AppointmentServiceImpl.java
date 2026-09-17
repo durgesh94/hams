@@ -66,7 +66,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 if (doctorAlreadyBooked) {
                         throw new AppointmentSlotAlreadyBookedException(
                                         "Dr. " + doctor.getFirstName() + " " + doctor.getLastName()
-                                                        + " is not available at the requested appointment date and time slot");
+                                                        + " is already booked during the selected time");
                 }
 
                 // Step 4: Check if the patient has overlapping appointments at the requested
@@ -80,7 +80,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                                                 List.of(AppointmentStatus.BOOKED, AppointmentStatus.CONFIRMED));
                 if (patientAlreadyBooked) {
                         throw new AppointmentSlotAlreadyBookedException(
-                                        "Patient is not available at the requested appointment date and time slot");
+                                        "Patient already has an appointment during the selected time");
                 }
 
                 // Step 5: Create the appointment entity

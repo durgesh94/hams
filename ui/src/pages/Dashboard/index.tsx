@@ -1,4 +1,6 @@
 import { Box, Button, Grid, Typography } from "@mui/material";
+import { useState } from "react";
+import { Select, MenuItem } from "@mui/material";
 import PageHeader from "../../components/common/PageHeader";
 import { useGetDashboardDataQuery as useDashboardDataQuery } from "../../features/dashboard/dashboardApi";
 import Card from "../../components/common/Card";
@@ -7,6 +9,8 @@ import type { DashboardData } from "../../features/dashboard/types";
 const Dashboard = () => {
   // Get the current month in YYYY-MM format to fetch dashboard data for this month
   const month = new Date().toISOString().slice(0, 7);
+  const [selectedMonth, setSelectedMonth] = useState(month);
+  console.log(selectedMonth, month);
 
   const {
     data: dashboardData = {} as DashboardData,
@@ -14,7 +18,7 @@ const Dashboard = () => {
     isError,
     error,
     refetch,
-  } = useDashboardDataQuery(month);
+  } = useDashboardDataQuery(selectedMonth);
 
   const errorMessage =
     error && "message" in error
@@ -23,12 +27,37 @@ const Dashboard = () => {
         ? error.error
         : "Something went wrong";
 
+
+  // dropdown for month selection
+  const handleMonthChange = (event: React.ChangeEvent<{ value: string }>) => {
+    setSelectedMonth(event.target.value as string);
+  };
+
+  const monthOptions = Array.from({ length: 12 }, (_, i) => {
+    const date = new Date();
+    date.setMonth(i);
+    return {
+      value: date.toISOString().slice(0, 7),
+      label: date.toLocaleString("default", { month: "long" }),
+    };
+  });
+
+  const monthDropdown = (
+    <Select value={selectedMonth} onChange={handleMonthChange}>
+      {monthOptions.map((option) => (
+        <MenuItem key={option.value} value={option.value}>
+          {option.label} {new Date(option.value).getFullYear()}
+        </MenuItem>
+      ))}
+    </Select>
+  );
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <PageHeader
         title="Dashboard"
         subtitle="Overview of hospital management system"
-        rightLabel={`${new Date().toLocaleString("default", { month: "long" })} ${new Date().getFullYear()}`}
+        rightContent={monthDropdown}
       />
 
       {isLoading && (

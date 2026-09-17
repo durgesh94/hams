@@ -50,6 +50,29 @@ const theme = createTheme({
         },
       },
     },
+    MuiTableSortLabel: {
+      styleOverrides: {
+        root: {
+          color: "#FFFFFF",
+
+          "&:hover": {
+            color: "#FFFFFF",
+          },
+
+          "&.Mui-active": {
+            color: "#FFFFFF",
+          },
+
+          "& .MuiTableSortLabel-icon": {
+            color: "#FFFFFF !important",
+          },
+
+          "&.Mui-active .MuiTableSortLabel-icon": {
+            color: "#FFFFFF !important",
+          },
+        },
+      },
+    },
   },
 });
 

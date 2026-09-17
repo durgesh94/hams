@@ -6,14 +6,14 @@ const PageHeader = ({
   subtitle,
   handleAction,
   actionLabel,
-  rightLabel,
+  rightContent,
   isAdmin,
 }: {
   title: string;
   subtitle?: string;
   handleAction?: () => void;
   actionLabel?: string;
-  rightLabel?: string;
+  rightContent?: React.ReactNode;
   isAdmin?: boolean;
 }) => {
   return (
@@ -41,11 +41,7 @@ const PageHeader = ({
           {actionLabel}
         </Button>
       )}
-      {rightLabel && (
-        <Typography variant="h6" sx={{ mb: 3 }}>
-          {rightLabel}
-        </Typography>
-      )}
+      {rightContent && <Box>{rightContent}</Box>}
     </Box>
   );
 };

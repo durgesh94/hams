@@ -15,6 +15,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TableSortLabel,
   TextField,
   Tooltip,
   Typography,
@@ -83,6 +84,8 @@ interface AppointmentTableProps {
   onDelete: (appointment: Appointment) => void;
 }
 
+type SortOrder = "asc" | "desc";
+
 const AppointmentTable = ({
   appointments,
   isLoading,
@@ -97,6 +100,9 @@ const AppointmentTable = ({
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  // Default sorting: appointment date ASC
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
 
   const filteredAppointments = useMemo(() => {
     const searchValue = search.toLowerCase().trim();
@@ -114,13 +120,41 @@ const AppointmentTable = ({
     );
   }, [appointments, search]);
 
-  const paginatedAppointments = filteredAppointments.slice(
+  /**
+   * Sort by appointment date.
+   *
+   * API date format:
+   * YYYY-MM-DD
+   *
+   * Example:
+   * 2026-09-15
+   * 2026-09-17
+   * 2026-09-20
+   *
+   * ISO date strings can safely be compared using localeCompare().
+   */
+  const sortedAppointments = useMemo(() => {
+    return [...filteredAppointments].sort((a, b) => {
+      const comparison = a.appointmentDate.localeCompare(b.appointmentDate);
+
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+  }, [filteredAppointments, sortOrder]);
+
+  const paginatedAppointments = sortedAppointments.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage,
   );
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
+    setPage(0);
+  };
+
+  const handleSortByDate = () => {
+    setSortOrder((currentOrder) => (currentOrder === "asc" ? "desc" : "asc"));
+
+    // Always return to first page when sorting
     setPage(0);
   };
 
@@ -187,10 +221,35 @@ const AppointmentTable = ({
                 <TableCell>ID</TableCell>
                 <TableCell>Patient</TableCell>
                 <TableCell>Doctor</TableCell>
-                <TableCell>Date</TableCell>
+
+                {/* Appointment Date */}
+                <TableCell>
+                  <TableSortLabel
+                    active
+                    direction={sortOrder}
+                    onClick={handleSortByDate}
+                    sx={{
+                      color: "primary.contrastText",
+                      "&:hover": {
+                        color: "primary.contrastText",
+                      },
+                      "&.Mui-active": {
+                        color: "primary.contrastText",
+                      },
+                      "& .MuiTableSortLabel-icon": {
+                        color: "primary.contrastText !important",
+                      },
+                    }}
+                  >
+                    Date
+                  </TableSortLabel>
+                </TableCell>
+
                 <TableCell>Time</TableCell>
                 <TableCell>Reason</TableCell>
+
                 <TableCell align="center">Status</TableCell>
+
                 <TableCell align="center">Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -208,6 +267,7 @@ const AppointmentTable = ({
                     <Typography color="error">
                       {getApiErrorMessage(error)}
                     </Typography>
+
                     <Button sx={{ mt: 1 }} onClick={onRefetch}>
                       Retry
                     </Button>
@@ -225,27 +285,37 @@ const AppointmentTable = ({
                     }}
                   >
                     <TableCell>{appointment.id}</TableCell>
+
                     <TableCell>
                       <Typography variant="body2">
                         {appointment.patientName}
                       </Typography>
                     </TableCell>
+
                     <TableCell>{appointment.doctorName}</TableCell>
+
                     <TableCell>
                       {formatDate(appointment.appointmentDate)}
                     </TableCell>
+
                     <TableCell>
                       {formatTime(appointment.appointmentTime)}
                     </TableCell>
+
                     <TableCell>{appointment.reason}</TableCell>
+
                     <TableCell align="center">
                       <Chip
                         label={appointment.status}
                         color={getStatusColor(appointment.status)}
                         size="small"
-                        sx={{ fontWeight: 500, minWidth: 90 }}
+                        sx={{
+                          fontWeight: 500,
+                          minWidth: 90,
+                        }}
                       />
                     </TableCell>
+
                     <TableCell align="center">
                       <Tooltip title="View">
                         <IconButton
@@ -302,7 +372,7 @@ const AppointmentTable = ({
         {!isLoading && !isError && (
           <TablePagination
             component="div"
-            count={filteredAppointments.length}
+            count={sortedAppointments.length}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
