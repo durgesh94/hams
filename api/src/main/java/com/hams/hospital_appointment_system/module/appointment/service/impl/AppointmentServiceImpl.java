@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         private final AppointmentRepository appointmentRepository;
         private final DoctorRepository doctorRepository;
         private final PatientRepository patientRepository;
+        private final AppointmentPageableService appointmentPageableService;
 
         @Override
         @Transactional
@@ -142,7 +144,12 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         @Override
         public Page<AppointmentResponse> getAppointments(AppointmentFilter filter, Pageable pageable) {
-                return appointmentRepository.findAll(AppointmentSpecification.filter(filter), pageable)
+
+                Specification<Appointment> specification = AppointmentSpecification.filter(filter);
+
+                Pageable sortedPageable = appointmentPageableService.create(pageable);
+
+                return appointmentRepository.findAll(specification, sortedPageable)
                                 .map(AppointmentMapper::toDto);
         }
 

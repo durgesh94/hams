@@ -9,7 +9,7 @@ import type {
 export const appointmentApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAppointments: builder.query<Appointment[], void>({
-      query: () => "/api/v1/appointments",
+      query: () => "/api/v1/appointments/filter",
       transformResponse: (response: ApiResponse<Appointment[]>) =>
         response.data,
       providesTags: ["Appointment"],

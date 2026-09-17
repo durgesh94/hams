@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import lombok.RequiredArgsConstructor;
 
 import com.hams.hospital_appointment_system.common.response.ApiResponse;
+import com.hams.hospital_appointment_system.common.response.PaginationResponse;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentFilter;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentRequest;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentResponse;
@@ -94,17 +95,29 @@ public class AppointmentController {
         }
 
         @GetMapping("/filter")
-        public ResponseEntity<ApiResponse<Page<AppointmentResponse>>> getAppointments(
+        public ResponseEntity<ApiResponse<List<AppointmentResponse>>> getAppointments(
                         @ModelAttribute AppointmentFilter filter,
                         Pageable pageable) {
                 Page<AppointmentResponse> response = appointmentService.getAppointments(filter, pageable);
-                ApiResponse<Page<AppointmentResponse>> apiResponse = ApiResponse.<Page<AppointmentResponse>>builder()
+
+                PaginationResponse pagination = PaginationResponse.builder()
+                                .page(response.getNumber())
+                                .size(response.getSize())
+                                .totalElements(response.getTotalElements())
+                                .totalPages(response.getTotalPages())
+                                .first(response.isFirst())
+                                .last(response.isLast())
+                                .build();
+
+                ApiResponse<List<AppointmentResponse>> apiResponse = ApiResponse.<List<AppointmentResponse>>builder()
                                 .status(HttpStatus.OK.value())
                                 .message("Appointments retrieved successfully")
-                                .data(response)
+                                .data(response.getContent())
+                                .pagination(pagination)
                                 .timestamp(LocalDateTime.now())
                                 .build();
-                return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+
+                return ResponseEntity.ok(apiResponse);
         }
 
         @GetMapping

@@ -34,7 +34,6 @@ public class AppointmentRequest {
     @NotNull(message = "Appointment time is required")
     private LocalTime appointmentTime;
 
-    @NotNull(message = "Status is required")
     private AppointmentStatus status;
 
     @Size(max = 500, message = "Reason must not exceed 500 characters")
