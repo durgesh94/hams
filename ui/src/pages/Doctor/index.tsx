@@ -6,6 +6,7 @@ import {
   useDeleteDoctorMutation,
   useGetDoctorsQuery,
 } from "../../features/doctors/doctorApi";
+import { getApiErrorMessage } from "../../utils/error.message";
 import type {
   CreateDoctorRequest,
   Doctor,
@@ -55,17 +56,7 @@ const DoctorPage = () => {
   };
 
   const showErrorToast = (error: unknown) => {
-    let message = "An error occurred. Please try again.";
-
-    if (error && typeof error === "object") {
-      const err = error as Record<string, unknown>;
-      const data = err.data as Record<string, unknown> | undefined;
-      if (data?.message && typeof data.message === "string") {
-        message = data.message;
-      } else if (err.message && typeof err.message === "string") {
-        message = err.message;
-      }
-    }
+    const message = getApiErrorMessage(error);
 
     setToastMessage(message);
     setToastSeverity("error");

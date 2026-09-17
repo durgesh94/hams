@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { DialogContentId } from "../../utils/dialog.constants";
 import { useSelector } from "react-redux";
+import { getApiErrorMessage } from "../../utils/error.message";
 import { Box } from "@mui/material";
 
 import AppDialog from "../../components/common/AppDialog";
@@ -54,18 +55,7 @@ const PatientPage = () => {
   };
 
   const showErrorToast = (error: unknown) => {
-    let message = "An error occurred. Please try again.";
-
-    if (error && typeof error === "object") {
-      const err = error as Record<string, unknown>;
-      const data = err.data as Record<string, unknown> | undefined;
-
-      if (data?.message && typeof data.message === "string") {
-        message = data.message;
-      } else if (err.message && typeof err.message === "string") {
-        message = err.message;
-      }
-    }
+    const message = getApiErrorMessage(error);
 
     setToastMessage(message);
     setToastSeverity("error");
