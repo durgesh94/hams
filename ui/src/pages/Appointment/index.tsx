@@ -21,11 +21,7 @@ import type {
 } from "../../features/appointments/types";
 import { useGetDoctorsQuery } from "../../features/doctors/doctorApi";
 import { useGetPatientsQuery } from "../../features/patients/patientApi";
-import {
-  getAppointmentFormId,
-  getDialogAction,
-  getDialogButtonLabel,
-} from "../../utils/appointment-utils";
+import { getDialogConfig } from "../../utils/dialog.utils";
 import { useSelector } from "react-redux";
 import { selectIsAdmin } from "../../features/auth/authSelectors";
 
@@ -192,13 +188,13 @@ const Appointments = () => {
         open={isDialogOpen}
         title={dialogTitle}
         onClose={handleDialogClose}
-        formId={getAppointmentFormId(dialogContentId)}
-        submitText={getDialogButtonLabel(dialogContentId)}
-        onSubmit={getDialogAction(
-          dialogContentId,
-          handleDeleteConfirm,
-          handleDialogClose,
-        )}
+        formId={getDialogConfig(dialogContentId, "appointment").formId}
+        submitText={getDialogConfig(dialogContentId, "appointment").buttonLabel}
+        onSubmit={
+          getDialogConfig(dialogContentId, "appointment").action === "delete"
+            ? handleDeleteConfirm
+            : handleDialogClose
+        }
         isSubmitting={isSubmitting}
       >
         {dialogContentId === 1 && (

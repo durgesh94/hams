@@ -18,10 +18,8 @@ import UpdateForm from "../../components/doctors/UpdateForm";
 import ViewDetails from "../../components/doctors/ViewDetails";
 import PageHeader from "../../components/common/PageHeader";
 import {
-  getDialogAction,
-  getDoctorFormId,
-  getDialogButtonLabel,
-} from "../../utils/doctor-utils";
+  getDialogConfig,
+} from "../../utils/dialog.utils";
 import ToastMessage from "../../components/common/ToastMessage";
 import { selectIsAdmin } from "../../features/auth/authSelectors";
 import { useSelector } from "react-redux";
@@ -172,7 +170,7 @@ const DoctorPage = () => {
         doctors={doctors}
         isLoading={isLoading}
         isError={isError}
-        error={error}
+        error={error ?? null}
         isAdmin={isAdmin}
         onRefetch={refetch}
         onView={handleView}
@@ -185,13 +183,13 @@ const DoctorPage = () => {
         open={isDialogOpen}
         title={dialogTitle}
         onClose={handleDialogClose}
-        formId={getDoctorFormId(dialogContentId)}
-        submitText={getDialogButtonLabel(dialogContentId)}
-        onSubmit={getDialogAction(
-          dialogContentId,
-          handleDeleteConfirm,
-          handleDialogClose,
-        )}
+        formId={getDialogConfig(dialogContentId, "doctor").formId}
+        submitText={getDialogConfig(dialogContentId, "doctor").buttonLabel}
+        onSubmit={
+          getDialogConfig(dialogContentId, "doctor").action === "delete"
+            ? handleDeleteConfirm
+            : handleDialogClose
+        }
         isSubmitting={isSubmitting}
       >
         {dialogContentId === 1 && (

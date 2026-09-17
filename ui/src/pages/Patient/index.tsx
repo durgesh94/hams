@@ -19,11 +19,7 @@ import type {
   Patient,
   UpdatePatientRequest,
 } from "../../features/patients/types";
-import {
-  getDialogAction,
-  getDialogButtonLabel,
-  getPatientFormId,
-} from "../../utils/patient-utils";
+import { getDialogConfig } from "../../utils/dialog.utils";
 import ToastMessage from "../../components/common/ToastMessage";
 import { selectIsAdmin } from "../../features/auth/authSelectors";
 
@@ -186,13 +182,13 @@ const PatientPage = () => {
         open={isDialogOpen}
         title={dialogTitle}
         onClose={handleDialogClose}
-        formId={getPatientFormId(dialogContentId)}
-        submitText={getDialogButtonLabel(dialogContentId)}
-        onSubmit={getDialogAction(
-          dialogContentId,
-          handleDeleteConfirm,
-          handleDialogClose,
-        )}
+        formId={getDialogConfig(dialogContentId, "patient").formId}
+        submitText={getDialogConfig(dialogContentId, "patient").buttonLabel}
+        onSubmit={
+          getDialogConfig(dialogContentId, "patient").action === "delete"
+            ? handleDeleteConfirm
+            : handleDialogClose
+        }
         isSubmitting={isSubmitting}
       >
         {dialogContentId === 1 && (
