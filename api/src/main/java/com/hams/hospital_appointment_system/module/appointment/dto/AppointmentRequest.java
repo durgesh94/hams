@@ -3,8 +3,9 @@ package com.hams.hospital_appointment_system.module.appointment.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.hams.hospital_appointment_system.module.appointment.entity.AppointmentStatus;
+
 import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,9 @@ public class AppointmentRequest {
 
     @NotNull(message = "Appointment time is required")
     private LocalTime appointmentTime;
+
+    @NotNull(message = "Status is required")
+    private AppointmentStatus status;
 
     @Size(max = 500, message = "Reason must not exceed 500 characters")
     private String reason;
