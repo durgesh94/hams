@@ -24,10 +24,11 @@ import { useGetPatientsQuery } from "../../features/patients/patientApi";
 import { getDialogConfig } from "../../utils/dialog.utils";
 import { useSelector } from "react-redux";
 import { selectIsAdmin } from "../../features/auth/authSelectors";
+import type { DialogContentId } from "../../utils/dialog.constants";
 
 const Appointments = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dialogContentId, setDialogContentId] = useState(0);
+  const [dialogContentId, setDialogContentId] = useState<DialogContentId>(1);
   const [dialogTitle, setDialogTitle] = useState("");
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);

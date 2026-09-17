@@ -23,10 +23,11 @@ import {
 import ToastMessage from "../../components/common/ToastMessage";
 import { selectIsAdmin } from "../../features/auth/authSelectors";
 import { useSelector } from "react-redux";
+import type { DialogContentId } from "../../utils/dialog.constants";
 
 const DoctorPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dialogContentId, setDialogContentId] = useState(0);
+  const [dialogContentId, setDialogContentId] = useState<DialogContentId>(1);
   const [dialogTitle, setDialogTitle] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);

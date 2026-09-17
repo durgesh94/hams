@@ -1,4 +1,10 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  Typography,
+  type SelectChangeEvent,
+} from "@mui/material";
 import { useState } from "react";
 import { Select, MenuItem } from "@mui/material";
 import PageHeader from "../../components/common/PageHeader";
@@ -27,9 +33,8 @@ const Dashboard = () => {
         ? error.error
         : "Something went wrong";
 
-
   // dropdown for month selection
-  const handleMonthChange = (event: React.ChangeEvent<{ value: string }>) => {
+  const handleMonthChange = (event: SelectChangeEvent<string>) => {
     setSelectedMonth(event.target.value as string);
   };
 

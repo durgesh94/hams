@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { DialogContentId } from "../../utils/dialog.constants";
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
 
@@ -25,7 +26,7 @@ import { selectIsAdmin } from "../../features/auth/authSelectors";
 
 const PatientPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dialogContentId, setDialogContentId] = useState(0);
+  const [dialogContentId, setDialogContentId] = useState<DialogContentId>(1);
   const [dialogTitle, setDialogTitle] = useState("");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
