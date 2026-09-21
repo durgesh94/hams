@@ -15,6 +15,11 @@ jobs:
         name: Backend CI
         runs-on: ubuntu-latest
 
+        env:
+            TEST_DB_URL: jdbc:postgresql://localhost:5432/hams_test_db
+            TEST_DB_USERNAME: hams
+            TEST_DB_PASSWORD: hams123
+
         services:
           postgres:
             image: postgres:15
@@ -44,6 +49,21 @@ jobs:
                 distribution: 'temurin'
                 cache: 'maven'
             
+            - name: Verify Java and Maven
+              run: |
+                java --version
+                mvn --version
+
+            - name: Verify PostgreSQL
+              run: |
+                PGPASSWORD="$TEST_DB_PASSWORD" \
+                psql \
+                -h localhost \
+                -p 5432 \
+                -U "$TEST_DB_USERNAME" \
+                -d hams_test_db \
+                -c "SELECT current_database(), current_user;"
+                    
             - name: Build and Test
               env:
                 TEST_DB_URL: jdbc:postgresql://localhost:5432/hams_test_db
