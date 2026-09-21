@@ -12,10 +12,7 @@ import {
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
-import type {
-  UpdateDoctorRequest,
-  Doctor,
-} from "../../features/doctors/types";
+import type { UpdateDoctorRequest, Doctor } from "../../features/doctors/types";
 import { Gender } from "../../constants/genderEnum";
 
 const updateDoctorSchema = z.object({
@@ -120,9 +117,12 @@ const UpdateForm = ({
         experienceYears: doctor.experienceYears,
         email: doctor.email,
         phone: doctor.phone,
-        status: (doctor.status === "ACTIVE" || doctor.status === "INACTIVE" || doctor.status === "ON_LEAVE")
-          ? doctor.status
-          : "ACTIVE",
+        status:
+          doctor.status === "ACTIVE" ||
+          doctor.status === "INACTIVE" ||
+          doctor.status === "ON_LEAVE"
+            ? doctor.status
+            : "ACTIVE",
       });
     }
   }, [doctor, reset]);
@@ -133,7 +133,7 @@ const UpdateForm = ({
         id: doctor.id,
         firstName: data.firstName.trim(),
         lastName: data.lastName.trim(),
-          gender: data.gender as Gender,
+        gender: data.gender as Gender,
         specialization: data.specialization.trim(),
         qualification: data.qualification.trim(),
         experienceYears: data.experienceYears,
@@ -294,9 +294,13 @@ const UpdateForm = ({
           value={status}
           label="Status"
           onChange={(event) => {
-            setValue("status", event.target.value as "ACTIVE" | "INACTIVE" | "ON_LEAVE", {
-              shouldValidate: true,
-            });
+            setValue(
+              "status",
+              event.target.value as "ACTIVE" | "INACTIVE" | "ON_LEAVE",
+              {
+                shouldValidate: true,
+              },
+            );
           }}
         >
           <MenuItem value="ACTIVE">Active</MenuItem>

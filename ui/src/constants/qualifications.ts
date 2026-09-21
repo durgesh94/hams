@@ -9,4 +9,5 @@ export const Qualifications = {
   DM: "DM",
 } as const;
 
-export type Qualification = (typeof Qualifications)[keyof typeof Qualifications];
+export type Qualification =
+  (typeof Qualifications)[keyof typeof Qualifications];

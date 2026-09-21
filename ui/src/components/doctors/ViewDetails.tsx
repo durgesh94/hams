@@ -32,9 +32,7 @@ interface ViewDetailsProps {
 }
 
 const formatValue = (value: string) =>
-  value
-    ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
-    : "-";
+  value ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase() : "-";
 
 const ViewDetails = ({ doctor }: ViewDetailsProps) => {
   if (!doctor) {
@@ -45,9 +43,7 @@ const ViewDetails = ({ doctor }: ViewDetailsProps) => {
           textAlign: "center",
         }}
       >
-        <Typography color="text.secondary">
-          No details available
-        </Typography>
+        <Typography color="text.secondary">No details available</Typography>
       </Box>
     );
   }
@@ -85,24 +81,16 @@ const ViewDetails = ({ doctor }: ViewDetailsProps) => {
           </Avatar>
 
           <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h5">
-              Dr. {fullName}
-            </Typography>
+            <Typography variant="h5">Dr. {fullName}</Typography>
 
             <Stack
               direction="row"
               spacing={1}
               sx={{ mt: 0.75, alignItems: "center", flexWrap: "wrap" }}
             >
-              <MedicalServicesOutlined
-                fontSize="small"
-                color="action"
-              />
+              <MedicalServicesOutlined fontSize="small" color="action" />
 
-              <Typography
-                variant="body1"
-                color="text.secondary"
-              >
+              <Typography variant="body1" color="text.secondary">
                 {doctor.specialization}
               </Typography>
             </Stack>
@@ -111,9 +99,7 @@ const ViewDetails = ({ doctor }: ViewDetailsProps) => {
           <Chip
             label={formatValue(doctor.status)}
             color={
-              doctor.status.toLowerCase() === "active"
-                ? "success"
-                : "default"
+              doctor.status.toLowerCase() === "active" ? "success" : "default"
             }
             size="small"
           />
@@ -121,10 +107,7 @@ const ViewDetails = ({ doctor }: ViewDetailsProps) => {
       </Paper>
 
       {/* Basic Information */}
-      <Typography
-        variant="subtitle1"
-        sx={{ mb: 1.5 }}
-      >
+      <Typography variant="subtitle1" sx={{ mb: 1.5 }}>
         Professional Information
       </Typography>
 
@@ -149,10 +132,7 @@ const ViewDetails = ({ doctor }: ViewDetailsProps) => {
       <Divider sx={{ mb: 3 }} />
 
       {/* Contact Information */}
-      <Typography
-        variant="subtitle1"
-        sx={{ mb: 1.5 }}
-      >
+      <Typography variant="subtitle1" sx={{ mb: 1.5 }}>
         Contact Information
       </Typography>
 
@@ -177,10 +157,7 @@ const ViewDetails = ({ doctor }: ViewDetailsProps) => {
       <Divider sx={{ mb: 3 }} />
 
       {/* Appointment Statistics */}
-      <Typography
-        variant="subtitle1"
-        sx={{ mb: 1.5 }}
-      >
+      <Typography variant="subtitle1" sx={{ mb: 1.5 }}>
         Appointment Statistics
       </Typography>
 
@@ -199,16 +176,9 @@ const ViewDetails = ({ doctor }: ViewDetailsProps) => {
           </Avatar>
 
           <Box>
-            <Typography
-              variant="h5"
-            >
-              {doctor.appointmentCount}
-            </Typography>
+            <Typography variant="h5">{doctor.appointmentCount}</Typography>
 
-            <Typography
-              variant="body2"
-              color="text.secondary"
-            >
+            <Typography variant="body2" color="text.secondary">
               Total Appointments
             </Typography>
           </Box>
@@ -224,11 +194,7 @@ interface InfoItemProps {
   value: string;
 }
 
-const InfoItem = ({
-  icon,
-  label,
-  value,
-}: InfoItemProps) => {
+const InfoItem = ({ icon, label, value }: InfoItemProps) => {
   return (
     <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
       <Box
@@ -247,10 +213,7 @@ const InfoItem = ({
       </Box>
 
       <Box sx={{ minWidth: 0 }}>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-        >
+        <Typography variant="caption" color="text.secondary">
           {label}
         </Typography>
 

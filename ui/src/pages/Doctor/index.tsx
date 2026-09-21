@@ -18,9 +18,7 @@ import AddForm from "../../components/doctors/AddForm";
 import UpdateForm from "../../components/doctors/UpdateForm";
 import ViewDetails from "../../components/doctors/ViewDetails";
 import PageHeader from "../../components/common/PageHeader";
-import {
-  getDialogConfig,
-} from "../../utils/dialog.utils";
+import { getDialogConfig } from "../../utils/dialog.utils";
 import ToastMessage from "../../components/common/ToastMessage";
 import { selectIsAdmin } from "../../features/auth/authSelectors";
 import { useSelector } from "react-redux";

@@ -52,9 +52,7 @@ const Sidebar = ({ mobileOpen, onClose }: SidebarProps) => {
     <Box>
       <Toolbar>
         <Person sx={{ mr: 1 }} />
-        <Typography variant="h6">
-          HAMS
-        </Typography>
+        <Typography variant="h6">HAMS</Typography>
       </Toolbar>
 
       <Divider />

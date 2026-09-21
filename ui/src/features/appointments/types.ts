@@ -1,4 +1,5 @@
-export type AppointmentStatus = "BOOKED" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
+export type AppointmentStatus =
+  "BOOKED" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
 export interface Appointment {
   id: number;
   patientId: number;

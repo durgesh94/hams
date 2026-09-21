@@ -16,10 +16,7 @@ const parseJwtPayload = (token: string): JwtPayload | null => {
     }
 
     const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const paddedBase64 = base64.padEnd(
-      Math.ceil(base64.length / 4) * 4,
-      "=",
-    );
+    const paddedBase64 = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
 
     return JSON.parse(window.atob(paddedBase64)) as JwtPayload;
   } catch {

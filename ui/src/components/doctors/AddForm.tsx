@@ -12,10 +12,7 @@ import {
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
-import type {
-  CreateDoctorRequest,
-  Doctor,
-} from "../../features/doctors/types";
+import type { CreateDoctorRequest, Doctor } from "../../features/doctors/types";
 import { Gender } from "../../constants/genderEnum";
 
 const doctorSchema = z.object({
@@ -120,9 +117,10 @@ const DoctorForm = ({
         experienceYears: doctor.experienceYears,
         email: doctor.email,
         phone: doctor.phone,
-        status: (doctor.status === "ACTIVE" || doctor.status === "INACTIVE")
-          ? doctor.status
-          : "ACTIVE",
+        status:
+          doctor.status === "ACTIVE" || doctor.status === "INACTIVE"
+            ? doctor.status
+            : "ACTIVE",
       });
     } else {
       reset({

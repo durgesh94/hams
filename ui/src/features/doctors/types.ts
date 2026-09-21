@@ -1,5 +1,4 @@
-export type DoctorStatus = "ACTIVE" | "INACTIVE" | "ON_LEAVE"; 
-
+export type DoctorStatus = "ACTIVE" | "INACTIVE" | "ON_LEAVE";
 
 export interface Doctor {
   id: number;
