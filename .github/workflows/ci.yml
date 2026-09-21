@@ -59,6 +59,11 @@ jobs:
                     
             - name: Build and Test
               run: mvn clean verify
+            
+            - name: SonarCloud analysis
+              run: mvn sonar:sonar
+              env:
+                SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         
     frontend:
         name: Frontend CI
