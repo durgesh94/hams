@@ -22,7 +22,7 @@ jobs:
 
         services:
           postgres:
-            image: postgres:15
+            image: postgres:17
             env:
               POSTGRES_USER: hams
               POSTGRES_PASSWORD: hams123
@@ -53,22 +53,8 @@ jobs:
               run: |
                 java --version
                 mvn --version
-
-            - name: Verify PostgreSQL
-              run: |
-                PGPASSWORD="$TEST_DB_PASSWORD" \
-                psql \
-                -h localhost \
-                -p 5432 \
-                -U "$TEST_DB_USERNAME" \
-                -d hams_test_db \
-                -c "SELECT current_database(), current_user;"
                     
             - name: Build and Test
-              env:
-                TEST_DB_URL: jdbc:postgresql://localhost:5432/hams_test_db
-                TEST_DB_USERNAME: hams
-                TEST_DB_PASSWORD: hams123
               run: mvn clean verify
         
     frontend:
