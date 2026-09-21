@@ -53,6 +53,9 @@ jobs:
               run: |
                 java --version
                 mvn --version
+            
+            - name: Check code formatting
+              run: mvn spotless:check
                     
             - name: Build and Test
               run: mvn clean verify
