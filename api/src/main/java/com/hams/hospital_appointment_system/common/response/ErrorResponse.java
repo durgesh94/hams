@@ -1,9 +1,8 @@
 package com.hams.hospital_appointment_system.common.response;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.Map;
+import lombok.*;
 
 @Getter
 @Setter
@@ -12,8 +11,8 @@ import java.util.Map;
 @Builder
 public class ErrorResponse {
 
-    private int status;
-    private String message;
-    private Map<String, String> errors;
-    private LocalDateTime timestamp;
+  private int status;
+  private String message;
+  private Map<String, String> errors;
+  private LocalDateTime timestamp;
 }

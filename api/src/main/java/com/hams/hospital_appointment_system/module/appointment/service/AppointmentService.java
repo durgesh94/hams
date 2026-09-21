@@ -3,26 +3,24 @@ package com.hams.hospital_appointment_system.module.appointment.service;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentFilter;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentRequest;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentResponse;
+import com.hams.hospital_appointment_system.module.appointment.entity.AppointmentStatus;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.hams.hospital_appointment_system.module.appointment.entity.AppointmentStatus;
-
 public interface AppointmentService {
 
-    AppointmentResponse createAppointment(AppointmentRequest request);
+  AppointmentResponse createAppointment(AppointmentRequest request);
 
-    AppointmentResponse getAppointmentById(Long appointmentId);
+  AppointmentResponse getAppointmentById(Long appointmentId);
 
-    AppointmentResponse updateAppointment(Long appointmentId, AppointmentRequest request);
+  AppointmentResponse updateAppointment(Long appointmentId, AppointmentRequest request);
 
-    AppointmentResponse updateAppointmentStatus(Long appointmentId, AppointmentStatus status);
+  AppointmentResponse updateAppointmentStatus(Long appointmentId, AppointmentStatus status);
 
-    Page<AppointmentResponse> getAppointments(AppointmentFilter filter, Pageable pageable);
+  Page<AppointmentResponse> getAppointments(AppointmentFilter filter, Pageable pageable);
 
-    List<AppointmentResponse> getAppointmentsList();
+  List<AppointmentResponse> getAppointmentsList();
 
-    Void deleteAppointment(Long appointmentId);
-
+  Void deleteAppointment(Long appointmentId);
 }

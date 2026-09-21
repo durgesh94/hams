@@ -7,21 +7,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AppointmentPageableService {
-    public Pageable create(Pageable pageable) {
+  public Pageable create(Pageable pageable) {
 
-        Sort.Direction direction = pageable.getSort().getOrderFor("appointmentDate") != null
-                ? pageable.getSort()
-                        .getOrderFor("appointmentDate")
-                        .getDirection()
-                : Sort.Direction.ASC;
+    Sort.Direction direction =
+        pageable.getSort().getOrderFor("appointmentDate") != null
+            ? pageable.getSort().getOrderFor("appointmentDate").getDirection()
+            : Sort.Direction.ASC;
 
-        Sort sort = Sort.by(
-                new Sort.Order(direction, "appointmentDate"),
-                new Sort.Order(direction, "appointmentTime"));
+    Sort sort =
+        Sort.by(
+            new Sort.Order(direction, "appointmentDate"),
+            new Sort.Order(direction, "appointmentTime"));
 
-        return PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                sort);
-    }
+    return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+  }
 }

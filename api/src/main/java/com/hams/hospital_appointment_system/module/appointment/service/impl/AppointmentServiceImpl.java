@@ -16,157 +16,186 @@ import com.hams.hospital_appointment_system.module.doctor.entity.DoctorStatus;
 import com.hams.hospital_appointment_system.module.doctor.repository.DoctorRepository;
 import com.hams.hospital_appointment_system.module.patient.entity.Patient;
 import com.hams.hospital_appointment_system.module.patient.repository.PatientRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class AppointmentServiceImpl implements AppointmentService {
 
-        private final AppointmentRepository appointmentRepository;
-        private final DoctorRepository doctorRepository;
-        private final PatientRepository patientRepository;
-        private final AppointmentPageableService appointmentPageableService;
+  private final AppointmentRepository appointmentRepository;
+  private final DoctorRepository doctorRepository;
+  private final PatientRepository patientRepository;
+  private final AppointmentPageableService appointmentPageableService;
 
-        @Override
-        @Transactional
-        public AppointmentResponse createAppointment(AppointmentRequest request) {
-                // Step 1: Retrieve the doctor and patient entities based on the request
-                Doctor doctor = doctorRepository.findById(request.getDoctorId())
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Doctor not found with id " + request.getDoctorId()));
-                Patient patient = patientRepository.findById(request.getPatientId())
-                                .orElseThrow(
-                                                () -> new ResourceNotFoundException(
-                                                                "Patient not found with id " + request.getPatientId()));
+  @Override
+  @Transactional
+  public AppointmentResponse createAppointment(AppointmentRequest request) {
+    // Step 1: Retrieve the doctor and patient entities based on the request
+    Doctor doctor =
+        doctorRepository
+            .findById(request.getDoctorId())
+            .orElseThrow(
+                () ->
+                    new ResourceNotFoundException(
+                        "Doctor not found with id " + request.getDoctorId()));
+    Patient patient =
+        patientRepository
+            .findById(request.getPatientId())
+            .orElseThrow(
+                () ->
+                    new ResourceNotFoundException(
+                        "Patient not found with id " + request.getPatientId()));
 
-                // Step 2: Check doctor status
-                if (doctor.getStatus() != DoctorStatus.ACTIVE) {
-                        throw new AppointmentSlotAlreadyBookedException(
-                                        "Dr. " + doctor.getFirstName() + " " + doctor.getLastName()
-                                                        + " is not available");
-                }
+    // Step 2: Check doctor status
+    if (doctor.getStatus() != DoctorStatus.ACTIVE) {
+      throw new AppointmentSlotAlreadyBookedException(
+          "Dr. " + doctor.getFirstName() + " " + doctor.getLastName() + " is not available");
+    }
 
-                // Step 3: Check if the doctor is available at the requested appointment date &
-                // time slot
-                boolean doctorAlreadyBooked = appointmentRepository
-                                .existsDoctorOverlappingAppointment(
-                                                request.getDoctorId(),
-                                                request.getAppointmentDate(),
-                                                request.getAppointmentTime(),
-                                                request.getAppointmentTime().plusMinutes(30),
-                                                List.of(AppointmentStatus.BOOKED, AppointmentStatus.CONFIRMED));
-                if (doctorAlreadyBooked) {
-                        throw new AppointmentSlotAlreadyBookedException(
-                                        "Dr. " + doctor.getFirstName() + " " + doctor.getLastName()
-                                                        + " is already booked during the selected time");
-                }
+    // Step 3: Check if the doctor is available at the requested appointment date &
+    // time slot
+    boolean doctorAlreadyBooked =
+        appointmentRepository.existsDoctorOverlappingAppointment(
+            request.getDoctorId(),
+            request.getAppointmentDate(),
+            request.getAppointmentTime(),
+            request.getAppointmentTime().plusMinutes(30),
+            List.of(AppointmentStatus.BOOKED, AppointmentStatus.CONFIRMED));
+    if (doctorAlreadyBooked) {
+      throw new AppointmentSlotAlreadyBookedException(
+          "Dr. "
+              + doctor.getFirstName()
+              + " "
+              + doctor.getLastName()
+              + " is already booked during the selected time");
+    }
 
-                // Step 4: Check if the patient has overlapping appointments at the requested
-                // appointment date & time slot
-                boolean patientAlreadyBooked = appointmentRepository
-                                .existsPatientOverlappingAppointment(
-                                                request.getPatientId(),
-                                                request.getAppointmentDate(),
-                                                request.getAppointmentTime(),
-                                                request.getAppointmentTime().plusMinutes(30),
-                                                List.of(AppointmentStatus.BOOKED, AppointmentStatus.CONFIRMED));
-                if (patientAlreadyBooked) {
-                        throw new AppointmentSlotAlreadyBookedException(
-                                        "Patient already has an appointment during the selected time");
-                }
+    // Step 4: Check if the patient has overlapping appointments at the requested
+    // appointment date & time slot
+    boolean patientAlreadyBooked =
+        appointmentRepository.existsPatientOverlappingAppointment(
+            request.getPatientId(),
+            request.getAppointmentDate(),
+            request.getAppointmentTime(),
+            request.getAppointmentTime().plusMinutes(30),
+            List.of(AppointmentStatus.BOOKED, AppointmentStatus.CONFIRMED));
+    if (patientAlreadyBooked) {
+      throw new AppointmentSlotAlreadyBookedException(
+          "Patient already has an appointment during the selected time");
+    }
 
-                // Step 5: Create the appointment entity
-                Appointment appointment = AppointmentMapper.toEntity(request, doctor, patient);
+    // Step 5: Create the appointment entity
+    Appointment appointment = AppointmentMapper.toEntity(request, doctor, patient);
 
-                // Step 6: Save the appointment entity to the database
-                appointment = appointmentRepository.save(appointment);
+    // Step 6: Save the appointment entity to the database
+    appointment = appointmentRepository.save(appointment);
 
-                // Step 7: Convert the saved appointment entity to a response DTO
-                return AppointmentMapper.toDto(appointment);
-        }
+    // Step 7: Convert the saved appointment entity to a response DTO
+    return AppointmentMapper.toDto(appointment);
+  }
 
-        @Override
-        public AppointmentResponse getAppointmentById(Long appointmentId) {
-                Appointment appointment = appointmentRepository.findById(appointmentId)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Appointment not found with id " + appointmentId));
-                return AppointmentMapper.toDto(appointment);
-        }
+  @Override
+  public AppointmentResponse getAppointmentById(Long appointmentId) {
+    Appointment appointment =
+        appointmentRepository
+            .findById(appointmentId)
+            .orElseThrow(
+                () ->
+                    new ResourceNotFoundException(
+                        "Appointment not found with id " + appointmentId));
+    return AppointmentMapper.toDto(appointment);
+  }
 
-        @Override
-        public AppointmentResponse updateAppointment(Long appointmentId, AppointmentRequest request) {
-                Appointment appointment = appointmentRepository.findById(appointmentId)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Appointment not found with id " + appointmentId));
-                Doctor doctor = doctorRepository.findById(request.getDoctorId())
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Doctor not found with id " + request.getDoctorId()));
-                Patient patient = patientRepository.findById(request.getPatientId())
-                                .orElseThrow(
-                                                () -> new ResourceNotFoundException(
-                                                                "Patient not found with id " + request.getPatientId()));
+  @Override
+  public AppointmentResponse updateAppointment(Long appointmentId, AppointmentRequest request) {
+    Appointment appointment =
+        appointmentRepository
+            .findById(appointmentId)
+            .orElseThrow(
+                () ->
+                    new ResourceNotFoundException(
+                        "Appointment not found with id " + appointmentId));
+    Doctor doctor =
+        doctorRepository
+            .findById(request.getDoctorId())
+            .orElseThrow(
+                () ->
+                    new ResourceNotFoundException(
+                        "Doctor not found with id " + request.getDoctorId()));
+    Patient patient =
+        patientRepository
+            .findById(request.getPatientId())
+            .orElseThrow(
+                () ->
+                    new ResourceNotFoundException(
+                        "Patient not found with id " + request.getPatientId()));
 
-                appointment.setDoctor(doctor);
-                appointment.setPatient(patient);
-                appointment.setAppointmentDate(request.getAppointmentDate());
-                appointment.setAppointmentTime(request.getAppointmentTime());
-                appointment.setStatus(request.getStatus());
-                appointment.setReason(request.getReason());
-                appointment.setNotes(request.getNotes());
-                appointment.setUpdatedAt(LocalDateTime.now());
+    appointment.setDoctor(doctor);
+    appointment.setPatient(patient);
+    appointment.setAppointmentDate(request.getAppointmentDate());
+    appointment.setAppointmentTime(request.getAppointmentTime());
+    appointment.setStatus(request.getStatus());
+    appointment.setReason(request.getReason());
+    appointment.setNotes(request.getNotes());
+    appointment.setUpdatedAt(LocalDateTime.now());
 
-                appointment = appointmentRepository.save(appointment);
-                return AppointmentMapper.toDto(appointment);
-        }
+    appointment = appointmentRepository.save(appointment);
+    return AppointmentMapper.toDto(appointment);
+  }
 
-        @Override
-        public AppointmentResponse updateAppointmentStatus(Long appointmentId, AppointmentStatus status) {
-                Appointment appointment = appointmentRepository.findById(appointmentId)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Appointment not found with id " + appointmentId));
+  @Override
+  public AppointmentResponse updateAppointmentStatus(Long appointmentId, AppointmentStatus status) {
+    Appointment appointment =
+        appointmentRepository
+            .findById(appointmentId)
+            .orElseThrow(
+                () ->
+                    new ResourceNotFoundException(
+                        "Appointment not found with id " + appointmentId));
 
-                appointment.setStatus(status);
-                appointment.setUpdatedAt(LocalDateTime.now());
+    appointment.setStatus(status);
+    appointment.setUpdatedAt(LocalDateTime.now());
 
-                appointment = appointmentRepository.save(appointment);
-                return AppointmentMapper.toDto(appointment);
-        }
+    appointment = appointmentRepository.save(appointment);
+    return AppointmentMapper.toDto(appointment);
+  }
 
-        @Override
-        public Page<AppointmentResponse> getAppointments(AppointmentFilter filter, Pageable pageable) {
+  @Override
+  public Page<AppointmentResponse> getAppointments(AppointmentFilter filter, Pageable pageable) {
 
-                Specification<Appointment> specification = AppointmentSpecification.filter(filter);
+    Specification<Appointment> specification = AppointmentSpecification.filter(filter);
 
-                Pageable sortedPageable = appointmentPageableService.create(pageable);
+    Pageable sortedPageable = appointmentPageableService.create(pageable);
 
-                return appointmentRepository.findAll(specification, sortedPageable)
-                                .map(AppointmentMapper::toDto);
-        }
+    return appointmentRepository
+        .findAll(specification, sortedPageable)
+        .map(AppointmentMapper::toDto);
+  }
 
-        public List<AppointmentResponse> getAppointmentsList() {
-                List<Appointment> appointments = appointmentRepository.findAll();
-                return appointments.stream()
-                                .map(AppointmentMapper::toDto)
-                                .collect(Collectors.toList());
-        }
+  public List<AppointmentResponse> getAppointmentsList() {
+    List<Appointment> appointments = appointmentRepository.findAll();
+    return appointments.stream().map(AppointmentMapper::toDto).collect(Collectors.toList());
+  }
 
-        @Override
-        public Void deleteAppointment(Long appointmentId) {
-                Appointment appointment = appointmentRepository.findById(appointmentId)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                "Appointment not found with id " + appointmentId));
+  @Override
+  public Void deleteAppointment(Long appointmentId) {
+    Appointment appointment =
+        appointmentRepository
+            .findById(appointmentId)
+            .orElseThrow(
+                () ->
+                    new ResourceNotFoundException(
+                        "Appointment not found with id " + appointmentId));
 
-                appointmentRepository.delete(appointment);
-                return null;
-        }
+    appointmentRepository.delete(appointment);
+    return null;
+  }
 }

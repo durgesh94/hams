@@ -13,32 +13,36 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
-    private final RoleRepository roleRepository;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+  private final RoleRepository roleRepository;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
-    @Override
-    public void run(String... args) {
+  @Override
+  public void run(String... args) {
 
-        Role adminRole = roleRepository.findByName("ADMIN")
-                .orElseThrow(() -> new IllegalStateException("Admin role not found"));
-        Role operatorRole = roleRepository.findByName("OPERATOR")
-                .orElseThrow(() -> new IllegalStateException("Operator role not found"));
+    Role adminRole =
+        roleRepository
+            .findByName("ADMIN")
+            .orElseThrow(() -> new IllegalStateException("Admin role not found"));
+    Role operatorRole =
+        roleRepository
+            .findByName("OPERATOR")
+            .orElseThrow(() -> new IllegalStateException("Operator role not found"));
 
-        createUserIfNotExists("admin","Admin@123", adminRole);
-        createUserIfNotExists("operator", "Operator@123", operatorRole);
+    createUserIfNotExists("admin", "Admin@123", adminRole);
+    createUserIfNotExists("operator", "Operator@123", operatorRole);
+  }
+
+  private void createUserIfNotExists(String username, String password, Role role) {
+    if (userRepository.existsByUsername(username)) {
+      return;
     }
 
-    private void createUserIfNotExists(String username, String password, Role role) {
-        if(userRepository.existsByUsername(username)){
-            return;
-        }
+    User user = new User();
+    user.setUsername(username);
+    user.setPassword(passwordEncoder.encode(password));
+    user.setRole(role);
 
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
-        user.setRole(role);
-
-        userRepository.save(user);
-    }
+    userRepository.save(user);
+  }
 }

@@ -1,5 +1,9 @@
 package com.hams.hospital_appointment_system.modules.health.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.hams.hospital_appointment_system.common.security.handler.JwtAuthenticationEntryPoint;
 import com.hams.hospital_appointment_system.common.security.service.CustomUserDetailsService;
 import com.hams.hospital_appointment_system.common.security.service.JwtService;
@@ -11,33 +15,25 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @WebMvcTest(HealthController.class)
 class HealthControllerTest {
 
-        @Autowired
-        private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-        @MockitoBean
-        private JwtService jwtService;
+  @MockitoBean private JwtService jwtService;
 
-        @MockitoBean
-        private CustomUserDetailsService customUserDetailsService;
+  @MockitoBean private CustomUserDetailsService customUserDetailsService;
 
-        @MockitoBean
-        private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+  @MockitoBean private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-        @Test
-        @WithMockUser
-        void health_shouldReturnUpStatus() throws Exception {
+  @Test
+  @WithMockUser
+  void health_shouldReturnUpStatus() throws Exception {
 
-                mockMvc.perform(get("/api/v1/health"))
-                                .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.status").value("Up"))
-                                .andExpect(jsonPath("$.message")
-                                                .value("Hospital Appointment System is running."));
-        }
+    mockMvc
+        .perform(get("/api/v1/health"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("Up"))
+        .andExpect(jsonPath("$.message").value("Hospital Appointment System is running."));
+  }
 }

@@ -1,10 +1,9 @@
 package com.hams.hospital_appointment_system.module.patient.entity;
 
-import java.time.LocalDate;
-
-import com.hams.hospital_appointment_system.common.enums.Gender;
 import com.hams.hospital_appointment_system.common.entity.BaseEntity;
+import com.hams.hospital_appointment_system.common.enums.Gender;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import lombok.*;
 
 @Entity
@@ -16,26 +15,26 @@ import lombok.*;
 @Builder
 public class Patient extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false)
-    private String firstName;
+  @Column(nullable = false)
+  private String firstName;
 
-    @Column(nullable = false)
-    private String lastName;
+  @Column(nullable = false)
+  private String lastName;
 
-    @Column(nullable = false)
-    private LocalDate dateOfBirth;
+  @Column(nullable = false)
+  private LocalDate dateOfBirth;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
-    private Gender gender;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 10)
+  private Gender gender;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+  @Column(nullable = false, unique = true)
+  private String email;
 
-    @Column(nullable = false)
-    private String phone;
+  @Column(nullable = false)
+  private String phone;
 }

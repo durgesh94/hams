@@ -1,49 +1,38 @@
 package com.hams.hospital_appointment_system.module.dashboard.service.impl;
 
-import com.hams.hospital_appointment_system.module.dashboard.service.DashboardService;
-
-import lombok.RequiredArgsConstructor;
-
 import com.hams.hospital_appointment_system.module.dashboard.dto.MonthlyDashboardResponse;
 import com.hams.hospital_appointment_system.module.dashboard.repository.DashboardRepository;
-
+import com.hams.hospital_appointment_system.module.dashboard.service.DashboardService;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
 
-        private final DashboardRepository dashboardRepository;
+  private final DashboardRepository dashboardRepository;
 
-        @Override
-        public MonthlyDashboardResponse getMonthlyStatistics(YearMonth month) {
+  @Override
+  public MonthlyDashboardResponse getMonthlyStatistics(YearMonth month) {
 
-                LocalDateTime startDate = month
-                                .atDay(1)
-                                .atStartOfDay();
+    LocalDateTime startDate = month.atDay(1).atStartOfDay();
 
-                LocalDateTime endDate = month
-                                .plusMonths(1)
-                                .atDay(1)
-                                .atStartOfDay();
+    LocalDateTime endDate = month.plusMonths(1).atDay(1).atStartOfDay();
 
-                long activeDoctorCount = dashboardRepository.countActiveDoctors();
+    long activeDoctorCount = dashboardRepository.countActiveDoctors();
 
-                long newPatientCount = dashboardRepository.countNewPatients(
-                                startDate,
-                                endDate);
+    long newPatientCount = dashboardRepository.countNewPatients(startDate, endDate);
 
-                long appointmentCount = dashboardRepository.countAppointments(
-                                startDate.toLocalDate(),
-                                endDate.toLocalDate());
+    long appointmentCount =
+        dashboardRepository.countAppointments(startDate.toLocalDate(), endDate.toLocalDate());
 
-                return MonthlyDashboardResponse.builder()
-                                .month(month.toString())
-                                .activeDoctorCount(activeDoctorCount)
-                                .newPatientCount(newPatientCount)
-                                .appointmentCount(appointmentCount)
-                                .build();
-        }
+    return MonthlyDashboardResponse.builder()
+        .month(month.toString())
+        .activeDoctorCount(activeDoctorCount)
+        .newPatientCount(newPatientCount)
+        .appointmentCount(appointmentCount)
+        .build();
+  }
 }

@@ -5,10 +5,9 @@ import java.util.List;
 
 public interface UserService {
 
-    public UserResponse getUserById(Long id);
+  public UserResponse getUserById(Long id);
 
-    public UserResponse getUserByUsername(String username);
+  public UserResponse getUserByUsername(String username);
 
-    public List<UserResponse> getAllUsers();
-    
+  public List<UserResponse> getAllUsers();
 }

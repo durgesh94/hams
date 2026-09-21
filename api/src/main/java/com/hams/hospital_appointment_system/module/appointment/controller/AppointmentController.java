@@ -1,28 +1,5 @@
 package com.hams.hospital_appointment_system.module.appointment.controller;
 
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-
-import lombok.RequiredArgsConstructor;
-
 import com.hams.hospital_appointment_system.common.response.ApiResponse;
 import com.hams.hospital_appointment_system.common.response.PaginationResponse;
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentFilter;
@@ -30,111 +7,133 @@ import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentRe
 import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentResponse;
 import com.hams.hospital_appointment_system.module.appointment.entity.AppointmentStatus;
 import com.hams.hospital_appointment_system.module.appointment.service.AppointmentService;
-
 import jakarta.validation.Valid;
+import java.time.LocalDateTime;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/appointments")
 @RequiredArgsConstructor
 public class AppointmentController {
 
-        private final AppointmentService appointmentService;
+  private final AppointmentService appointmentService;
 
-        @PostMapping
-        public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment(
-                        @Valid @RequestBody AppointmentRequest request) {
-                AppointmentResponse response = appointmentService.createAppointment(request);
-                ApiResponse<AppointmentResponse> apiResponse = ApiResponse.<AppointmentResponse>builder()
-                                .status(HttpStatus.CREATED.value())
-                                .message("Appointment created successfully")
-                                .data(response)
-                                .timestamp(LocalDateTime.now())
-                                .build();
-                return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
-        }
+  @PostMapping
+  public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment(
+      @Valid @RequestBody AppointmentRequest request) {
+    AppointmentResponse response = appointmentService.createAppointment(request);
+    ApiResponse<AppointmentResponse> apiResponse =
+        ApiResponse.<AppointmentResponse>builder()
+            .status(HttpStatus.CREATED.value())
+            .message("Appointment created successfully")
+            .data(response)
+            .timestamp(LocalDateTime.now())
+            .build();
+    return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
+  }
 
-        @GetMapping("/{id}")
-        public ResponseEntity<ApiResponse<AppointmentResponse>> getAppointmentById(
-                        @PathVariable("id") Long appointmentId) {
-                AppointmentResponse response = appointmentService.getAppointmentById(appointmentId);
-                ApiResponse<AppointmentResponse> apiResponse = ApiResponse.<AppointmentResponse>builder()
-                                .status(HttpStatus.OK.value())
-                                .message("Appointment retrieved successfully")
-                                .data(response)
-                                .timestamp(LocalDateTime.now())
-                                .build();
-                return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        }
+  @GetMapping("/{id}")
+  public ResponseEntity<ApiResponse<AppointmentResponse>> getAppointmentById(
+      @PathVariable("id") Long appointmentId) {
+    AppointmentResponse response = appointmentService.getAppointmentById(appointmentId);
+    ApiResponse<AppointmentResponse> apiResponse =
+        ApiResponse.<AppointmentResponse>builder()
+            .status(HttpStatus.OK.value())
+            .message("Appointment retrieved successfully")
+            .data(response)
+            .timestamp(LocalDateTime.now())
+            .build();
+    return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+  }
 
-        @PutMapping("/{id}")
-        public ResponseEntity<ApiResponse<AppointmentResponse>> updateAppointment(
-                        @PathVariable("id") Long appointmentId,
-                        @Valid @RequestBody AppointmentRequest request) {
-                AppointmentResponse response = appointmentService.updateAppointment(appointmentId, request);
-                ApiResponse<AppointmentResponse> apiResponse = ApiResponse.<AppointmentResponse>builder()
-                                .status(HttpStatus.OK.value())
-                                .message("Appointment updated successfully")
-                                .data(response)
-                                .timestamp(LocalDateTime.now())
-                                .build();
-                return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        }
+  @PutMapping("/{id}")
+  public ResponseEntity<ApiResponse<AppointmentResponse>> updateAppointment(
+      @PathVariable("id") Long appointmentId, @Valid @RequestBody AppointmentRequest request) {
+    AppointmentResponse response = appointmentService.updateAppointment(appointmentId, request);
+    ApiResponse<AppointmentResponse> apiResponse =
+        ApiResponse.<AppointmentResponse>builder()
+            .status(HttpStatus.OK.value())
+            .message("Appointment updated successfully")
+            .data(response)
+            .timestamp(LocalDateTime.now())
+            .build();
+    return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+  }
 
-        @PatchMapping("/{id}/status")
-        public ResponseEntity<ApiResponse<AppointmentResponse>> updateAppointmentStatus(
-                        @PathVariable("id") Long appointmentId,
-                        @RequestParam("status") AppointmentStatus status) {
-                AppointmentResponse response = appointmentService.updateAppointmentStatus(appointmentId, status);
-                ApiResponse<AppointmentResponse> apiResponse = ApiResponse.<AppointmentResponse>builder()
-                                .status(HttpStatus.OK.value())
-                                .message("Appointment status updated successfully")
-                                .data(response)
-                                .timestamp(LocalDateTime.now())
-                                .build();
-                return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        }
+  @PatchMapping("/{id}/status")
+  public ResponseEntity<ApiResponse<AppointmentResponse>> updateAppointmentStatus(
+      @PathVariable("id") Long appointmentId, @RequestParam("status") AppointmentStatus status) {
+    AppointmentResponse response =
+        appointmentService.updateAppointmentStatus(appointmentId, status);
+    ApiResponse<AppointmentResponse> apiResponse =
+        ApiResponse.<AppointmentResponse>builder()
+            .status(HttpStatus.OK.value())
+            .message("Appointment status updated successfully")
+            .data(response)
+            .timestamp(LocalDateTime.now())
+            .build();
+    return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+  }
 
-        @GetMapping("/filter")
-        public ResponseEntity<ApiResponse<List<AppointmentResponse>>> getAppointments(
-                        @ModelAttribute AppointmentFilter filter,
-                        Pageable pageable) {
-                Page<AppointmentResponse> response = appointmentService.getAppointments(filter, pageable);
+  @GetMapping("/filter")
+  public ResponseEntity<ApiResponse<List<AppointmentResponse>>> getAppointments(
+      @ModelAttribute AppointmentFilter filter, Pageable pageable) {
+    Page<AppointmentResponse> response = appointmentService.getAppointments(filter, pageable);
 
-                PaginationResponse pagination = PaginationResponse.builder()
-                                .page(response.getNumber())
-                                .size(response.getSize())
-                                .totalElements(response.getTotalElements())
-                                .totalPages(response.getTotalPages())
-                                .first(response.isFirst())
-                                .last(response.isLast())
-                                .build();
+    PaginationResponse pagination =
+        PaginationResponse.builder()
+            .page(response.getNumber())
+            .size(response.getSize())
+            .totalElements(response.getTotalElements())
+            .totalPages(response.getTotalPages())
+            .first(response.isFirst())
+            .last(response.isLast())
+            .build();
 
-                ApiResponse<List<AppointmentResponse>> apiResponse = ApiResponse.<List<AppointmentResponse>>builder()
-                                .status(HttpStatus.OK.value())
-                                .message("Appointments retrieved successfully")
-                                .data(response.getContent())
-                                .pagination(pagination)
-                                .timestamp(LocalDateTime.now())
-                                .build();
+    ApiResponse<List<AppointmentResponse>> apiResponse =
+        ApiResponse.<List<AppointmentResponse>>builder()
+            .status(HttpStatus.OK.value())
+            .message("Appointments retrieved successfully")
+            .data(response.getContent())
+            .pagination(pagination)
+            .timestamp(LocalDateTime.now())
+            .build();
 
-                return ResponseEntity.ok(apiResponse);
-        }
+    return ResponseEntity.ok(apiResponse);
+  }
 
-        @GetMapping
-        public ResponseEntity<ApiResponse<List<AppointmentResponse>>> getAppointmentsList() {
-                List<AppointmentResponse> response = appointmentService.getAppointmentsList();
-                ApiResponse<List<AppointmentResponse>> apiResponse = ApiResponse.<List<AppointmentResponse>>builder()
-                                .status(HttpStatus.OK.value())
-                                .message("Appointments retrieved successfully")
-                                .data(response)
-                                .timestamp(LocalDateTime.now())
-                                .build();
-                return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-        }
+  @GetMapping
+  public ResponseEntity<ApiResponse<List<AppointmentResponse>>> getAppointmentsList() {
+    List<AppointmentResponse> response = appointmentService.getAppointmentsList();
+    ApiResponse<List<AppointmentResponse>> apiResponse =
+        ApiResponse.<List<AppointmentResponse>>builder()
+            .status(HttpStatus.OK.value())
+            .message("Appointments retrieved successfully")
+            .data(response)
+            .timestamp(LocalDateTime.now())
+            .build();
+    return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+  }
 
-        @DeleteMapping("/{id}")
-        public ResponseEntity<Void> deleteAppointment(@PathVariable("id") Long appointmentId) {
-                appointmentService.deleteAppointment(appointmentId);
-                return ResponseEntity.noContent().build();
-        }
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteAppointment(@PathVariable("id") Long appointmentId) {
+    appointmentService.deleteAppointment(appointmentId);
+    return ResponseEntity.noContent().build();
+  }
 }

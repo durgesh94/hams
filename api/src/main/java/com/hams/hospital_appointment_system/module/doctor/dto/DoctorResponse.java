@@ -12,15 +12,15 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class DoctorResponse {
-    private Long id;
-    private String firstName;
-    private String lastName;
-    private String gender;
-    private String email;
-    private String specialization;
-    private String qualification;
-    private Integer experienceYears;
-    private String phone;
-    private String status;
-    private Long appointmentCount;
+  private Long id;
+  private String firstName;
+  private String lastName;
+  private String gender;
+  private String email;
+  private String specialization;
+  private String qualification;
+  private Integer experienceYears;
+  private String phone;
+  private String status;
+  private Long appointmentCount;
 }

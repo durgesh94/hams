@@ -1,7 +1,7 @@
 package com.hams.hospital_appointment_system.module.doctor.entity;
 
-import com.hams.hospital_appointment_system.common.enums.Gender;
 import com.hams.hospital_appointment_system.common.entity.BaseEntity;
+import com.hams.hospital_appointment_system.common.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,36 +14,36 @@ import lombok.*;
 @Builder
 public class Doctor extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(nullable = false, length = 100)
-    private String firstName;
+  @Column(nullable = false, length = 100)
+  private String firstName;
 
-    @Column(nullable = false, length = 100)
-    private String lastName;
+  @Column(nullable = false, length = 100)
+  private String lastName;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
-    private Gender gender;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 10)
+  private Gender gender;
 
-    @Column(nullable = false, length = 100)
-    private String specialization;
+  @Column(nullable = false, length = 100)
+  private String specialization;
 
-    @Column(nullable = false, length = 255)
-    private String qualification;
+  @Column(nullable = false, length = 255)
+  private String qualification;
 
-    @Column(nullable = false, unique = true, length = 255)
-    private String email;
+  @Column(nullable = false, unique = true, length = 255)
+  private String email;
 
-    @Column(nullable = false, length = 20)
-    private String phone;
+  @Column(nullable = false, length = 20)
+  private String phone;
 
-    @Column(nullable = false)
-    private Integer experienceYears;
+  @Column(nullable = false)
+  private Integer experienceYears;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private DoctorStatus status;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
+  private DoctorStatus status;
 }

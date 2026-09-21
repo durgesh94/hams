@@ -12,19 +12,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
+  private final AuthenticationManager authenticationManager;
+  private final JwtService jwtService;
 
-    public LoginResponse login(LoginRequest loginRequest) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
+  public LoginResponse login(LoginRequest loginRequest) {
+    authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(
+            loginRequest.getUsername(), loginRequest.getPassword()));
 
-        String token = jwtService.generateToken(loginRequest.getUsername());
+    String token = jwtService.generateToken(loginRequest.getUsername());
 
-        return new LoginResponse(token);
-    }
+    return new LoginResponse(token);
+  }
 }

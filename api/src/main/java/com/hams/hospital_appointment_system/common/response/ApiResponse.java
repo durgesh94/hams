@@ -1,12 +1,11 @@
 package com.hams.hospital_appointment_system.common.response;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -15,9 +14,9 @@ import java.time.LocalDateTime;
 @Builder
 public class ApiResponse<T> {
 
-    private int status;
-    private String message;
-    private T data;
-    private PaginationResponse pagination;
-    private LocalDateTime timestamp;
+  private int status;
+  private String message;
+  private T data;
+  private PaginationResponse pagination;
+  private LocalDateTime timestamp;
 }

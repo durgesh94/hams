@@ -1,46 +1,41 @@
 package com.hams.hospital_appointment_system.module.appointment.repository;
 
+import com.hams.hospital_appointment_system.module.appointment.entity.Appointment;
+import com.hams.hospital_appointment_system.module.appointment.entity.AppointmentStatus;
 import java.time.LocalDate;
 import java.time.LocalTime;
-
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
+public interface AppointmentRepository
+    extends JpaRepository<Appointment, Long>, JpaSpecificationExecutor<Appointment> {
 
-import com.hams.hospital_appointment_system.module.appointment.entity.Appointment;
-import com.hams.hospital_appointment_system.module.appointment.entity.AppointmentStatus;
+  List<Appointment> findByDoctorIdAndAppointmentDate(Long doctorId, LocalDate appointmentDate);
 
-public interface AppointmentRepository extends
-                JpaRepository<Appointment, Long>,
-                JpaSpecificationExecutor<Appointment> {
+  List<Appointment> findByPatientId(Long patientId);
 
-        List<Appointment> findByDoctorIdAndAppointmentDate(
-                        Long doctorId,
-                        LocalDate appointmentDate);
+  List<Appointment> findByDoctorId(Long doctorId);
 
-        List<Appointment> findByPatientId(Long patientId);
+  List<Appointment> findByStatus(AppointmentStatus status);
 
-        List<Appointment> findByDoctorId(Long doctorId);
+  // deprecated: use existsPatientOverlappingAppointment or
+  // existsDoctorOverlappingAppointment instead
+  boolean existsByDoctorIdAndAppointmentDateAndAppointmentTimeAndStatusIn(
+      Long doctorId,
+      LocalDate appointmentDate,
+      LocalTime appointmentTime,
+      List<AppointmentStatus> statuses);
 
-        List<Appointment> findByStatus(AppointmentStatus status);
+  long countByDoctorId(Long doctorId);
 
-        // deprecated: use existsPatientOverlappingAppointment or
-        // existsDoctorOverlappingAppointment instead
-        boolean existsByDoctorIdAndAppointmentDateAndAppointmentTimeAndStatusIn(
-                        Long doctorId,
-                        LocalDate appointmentDate,
-                        LocalTime appointmentTime,
-                        List<AppointmentStatus> statuses);
-
-        long countByDoctorId(Long doctorId);
-
-        // Check if a patient has overlapping appointments within the specified time
-        // range and statuses
-        // Returns true if there is at least one overlapping appointment
-        @Query("""
+  // Check if a patient has overlapping appointments within the specified time
+  // range and statuses
+  // Returns true if there is at least one overlapping appointment
+  @Query(
+      """
                             SELECT COUNT(a) > 0
                             FROM Appointment a
                             WHERE a.patient.id = :patientId
@@ -49,17 +44,18 @@ public interface AppointmentRepository extends
                               AND a.appointmentEndTime > :newStartTime
                               AND a.status IN :statuses
                         """)
-        boolean existsPatientOverlappingAppointment(
-                        @Param("patientId") Long patientId,
-                        @Param("appointmentDate") LocalDate appointmentDate,
-                        @Param("newStartTime") LocalTime newStartTime,
-                        @Param("newEndTime") LocalTime newEndTime,
-                        @Param("statuses") List<AppointmentStatus> statuses);
+  boolean existsPatientOverlappingAppointment(
+      @Param("patientId") Long patientId,
+      @Param("appointmentDate") LocalDate appointmentDate,
+      @Param("newStartTime") LocalTime newStartTime,
+      @Param("newEndTime") LocalTime newEndTime,
+      @Param("statuses") List<AppointmentStatus> statuses);
 
-        // Check if a doctor has overlapping appointments within the specified time
-        // range and statuses
-        // Returns true if there is at least one overlapping appointment
-        @Query("""
+  // Check if a doctor has overlapping appointments within the specified time
+  // range and statuses
+  // Returns true if there is at least one overlapping appointment
+  @Query(
+      """
                             SELECT COUNT(a) > 0
                             FROM Appointment a
                             WHERE a.doctor.id = :doctorId
@@ -68,10 +64,10 @@ public interface AppointmentRepository extends
                               AND a.appointmentEndTime > :newStartTime
                               AND a.status IN :statuses
                         """)
-        boolean existsDoctorOverlappingAppointment(
-                        @Param("doctorId") Long doctorId,
-                        @Param("appointmentDate") LocalDate appointmentDate,
-                        @Param("newStartTime") LocalTime newStartTime,
-                        @Param("newEndTime") LocalTime newEndTime,
-                        @Param("statuses") List<AppointmentStatus> statuses);
+  boolean existsDoctorOverlappingAppointment(
+      @Param("doctorId") Long doctorId,
+      @Param("appointmentDate") LocalDate appointmentDate,
+      @Param("newStartTime") LocalTime newStartTime,
+      @Param("newEndTime") LocalTime newEndTime,
+      @Param("statuses") List<AppointmentStatus> statuses);
 }

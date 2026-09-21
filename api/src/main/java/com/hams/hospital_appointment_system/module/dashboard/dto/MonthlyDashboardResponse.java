@@ -8,13 +8,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor 
-@AllArgsConstructor 
-@Builder 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MonthlyDashboardResponse {
-   
-    private String month;
-    private Long activeDoctorCount;
-    private Long newPatientCount;
-    private Long appointmentCount;
+
+  private String month;
+  private Long activeDoctorCount;
+  private Long newPatientCount;
+  private Long appointmentCount;
 }
