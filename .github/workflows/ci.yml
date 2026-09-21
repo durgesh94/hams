@@ -64,6 +64,14 @@ jobs:
               run: mvn sonar:sonar
               env:
                 SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            
+            - name: Publish Backend Test Results
+              if: always()
+              uses: dorny/test-reporter@v2
+              with:
+                name: Backend Test Report
+                path: api/target/surefire-reports/*.xml
+                reporter: java-junit
         
     frontend:
         name: Frontend CI
