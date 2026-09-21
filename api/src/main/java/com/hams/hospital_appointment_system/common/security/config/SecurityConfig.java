@@ -37,6 +37,8 @@ public class SecurityConfig {
       throws Exception {
     return httpSecurity
         .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
+        // CSRF is disabled because this API uses stateless JWT authentication
+        // through the Authorization header rather than cookie-based authentication.
         .csrf(csrf -> csrf.disable())
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
