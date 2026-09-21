@@ -73,6 +73,7 @@ public class AppointmentSpecificationTest {
 		.patient(patient)
 		.appointmentDate(date)
 		.appointmentTime(LocalTime.of(10, 30))
+		.appointmentEndTime(LocalTime.of(11, 0))
 		.reason("Routine check-up")
 		.notes("Bring previous reports")
 		.status(status)
@@ -146,7 +147,8 @@ public class AppointmentSpecificationTest {
 
 	List<Appointment> results = appointmentRepository.findAll(AppointmentSpecification.filter(filter));
 
-	assertThat(results).extracting(Appointment::getAppointmentDate).containsExactly(matchingDate);
+	assertThat(results).hasSize(1);
+	assertThat(results.get(0).getAppointmentDate()).isEqualTo(matchingDate);
     }
 
     @Test
@@ -163,7 +165,8 @@ public class AppointmentSpecificationTest {
 
 	List<Appointment> results = appointmentRepository.findAll(AppointmentSpecification.filter(filter));
 
-	assertThat(results).extracting(Appointment::getStatus).containsExactly(AppointmentStatus.CONFIRMED);
+	assertThat(results).hasSize(1);
+	assertThat(results.get(0).getStatus()).isEqualTo(AppointmentStatus.CONFIRMED);
     }
 
     @Test

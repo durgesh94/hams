@@ -148,8 +148,14 @@ public class AppointmentControllerTest {
 		.andExpect(status().isOk())
 		.andExpect(jsonPath("$.status").value(200))
 		.andExpect(jsonPath("$.message").value("Appointments retrieved successfully"))
-		.andExpect(jsonPath("$.data.content").isArray())
-		.andExpect(jsonPath("$.data.content.length()").value(1));
+		.andExpect(jsonPath("$.data").isArray())
+		.andExpect(jsonPath("$.data.length()").value(1))
+		.andExpect(jsonPath("$.pagination.page").value(0))
+		.andExpect(jsonPath("$.pagination.size").value(10))
+		.andExpect(jsonPath("$.pagination.totalElements").value(1))
+		.andExpect(jsonPath("$.pagination.totalPages").value(1))
+		.andExpect(jsonPath("$.pagination.first").value(true))
+		.andExpect(jsonPath("$.pagination.last").value(true));
 
 	verify(appointmentService).getAppointments(any(), any());
     }

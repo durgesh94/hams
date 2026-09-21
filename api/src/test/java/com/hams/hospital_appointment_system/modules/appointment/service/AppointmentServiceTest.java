@@ -9,6 +9,7 @@ import com.hams.hospital_appointment_system.module.appointment.dto.AppointmentFi
 import com.hams.hospital_appointment_system.module.appointment.entity.AppointmentStatus;
 import com.hams.hospital_appointment_system.module.appointment.entity.Appointment;
 import com.hams.hospital_appointment_system.module.appointment.repository.AppointmentRepository;
+import com.hams.hospital_appointment_system.module.appointment.service.impl.AppointmentPageableService;
 import com.hams.hospital_appointment_system.module.appointment.service.impl.AppointmentServiceImpl;
 import com.hams.hospital_appointment_system.module.doctor.entity.Doctor;
 import com.hams.hospital_appointment_system.module.doctor.entity.DoctorStatus;
@@ -23,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -48,6 +50,9 @@ public class AppointmentServiceTest {
 
     @Mock
     private PatientRepository patientRepository;
+
+	@Mock
+	private AppointmentPageableService appointmentPageableService;
 
     @InjectMocks
     private AppointmentServiceImpl appointmentService;
@@ -98,6 +103,7 @@ public class AppointmentServiceTest {
 		.patient(buildPatient())
 		.appointmentDate(request.getAppointmentDate())
 		.appointmentTime(request.getAppointmentTime())
+		.appointmentEndTime(request.getAppointmentTime().plusMinutes(30))
 		.reason(request.getReason())
 		.notes(request.getNotes())
 		.status(AppointmentStatus.BOOKED)
@@ -115,6 +121,7 @@ public class AppointmentServiceTest {
 		.patient(patient)
 		.appointmentDate(request.getAppointmentDate())
 		.appointmentTime(request.getAppointmentTime())
+		.appointmentEndTime(request.getAppointmentTime().plusMinutes(30))
 		.reason(request.getReason())
 		.notes(request.getNotes())
 		.status(AppointmentStatus.BOOKED)
@@ -123,9 +130,15 @@ public class AppointmentServiceTest {
 	when(doctorRepository.findById(request.getDoctorId())).thenReturn(Optional.of(doctor));
 	when(patientRepository.findById(request.getPatientId())).thenReturn(Optional.of(patient));
 	when(appointmentRepository
-		.existsByDoctorIdAndAppointmentDateAndAppointmentTimeAndStatusIn(
+		.existsDoctorOverlappingAppointment(
 			request.getDoctorId(), request.getAppointmentDate(), request.getAppointmentTime(),
+		request.getAppointmentTime().plusMinutes(30),
 			List.of(AppointmentStatus.BOOKED, AppointmentStatus.CONFIRMED)))
+		.thenReturn(false);
+	when(appointmentRepository.existsPatientOverlappingAppointment(
+		request.getPatientId(), request.getAppointmentDate(), request.getAppointmentTime(),
+		request.getAppointmentTime().plusMinutes(30),
+		List.of(AppointmentStatus.BOOKED, AppointmentStatus.CONFIRMED)))
 		.thenReturn(false);
 	when(appointmentRepository.save(any(Appointment.class))).thenReturn(savedAppointment);
 
@@ -147,7 +160,7 @@ public class AppointmentServiceTest {
 
 	assertThatThrownBy(() -> appointmentService.createAppointment(request))
 		.isInstanceOf(AppointmentSlotAlreadyBookedException.class)
-		.hasMessageContaining("is not available");
+		.hasMessageContaining("Dr. John Smith is not available");
 
 	verify(appointmentRepository, never()).save(any(Appointment.class));
     }
@@ -159,14 +172,39 @@ public class AppointmentServiceTest {
 		.thenReturn(Optional.of(buildDoctor(DoctorStatus.ACTIVE)));
 	when(patientRepository.findById(request.getPatientId())).thenReturn(Optional.of(buildPatient()));
 	when(appointmentRepository
-		.existsByDoctorIdAndAppointmentDateAndAppointmentTimeAndStatusIn(
+		.existsDoctorOverlappingAppointment(
 			request.getDoctorId(), request.getAppointmentDate(), request.getAppointmentTime(),
+		request.getAppointmentTime().plusMinutes(30),
 			List.of(AppointmentStatus.BOOKED, AppointmentStatus.CONFIRMED)))
 		.thenReturn(true);
 
 	assertThatThrownBy(() -> appointmentService.createAppointment(request))
 		.isInstanceOf(AppointmentSlotAlreadyBookedException.class)
-		.hasMessageContaining("requested appointment date");
+		.hasMessageContaining("Dr. John Smith is already booked during the selected time");
+
+	verify(appointmentRepository, never()).save(any(Appointment.class));
+    }
+
+    @Test
+    void createAppointment_shouldThrow_whenPatientAppointmentOverlaps() {
+	AppointmentRequest request = buildRequest();
+	when(doctorRepository.findById(request.getDoctorId()))
+		.thenReturn(Optional.of(buildDoctor(DoctorStatus.ACTIVE)));
+	when(patientRepository.findById(request.getPatientId())).thenReturn(Optional.of(buildPatient()));
+	when(appointmentRepository.existsDoctorOverlappingAppointment(
+		request.getDoctorId(), request.getAppointmentDate(), request.getAppointmentTime(),
+		request.getAppointmentTime().plusMinutes(30),
+		List.of(AppointmentStatus.BOOKED, AppointmentStatus.CONFIRMED)))
+		.thenReturn(false);
+	when(appointmentRepository.existsPatientOverlappingAppointment(
+		request.getPatientId(), request.getAppointmentDate(), request.getAppointmentTime(),
+		request.getAppointmentTime().plusMinutes(30),
+		List.of(AppointmentStatus.BOOKED, AppointmentStatus.CONFIRMED)))
+		.thenReturn(true);
+
+	assertThatThrownBy(() -> appointmentService.createAppointment(request))
+		.isInstanceOf(AppointmentSlotAlreadyBookedException.class)
+		.hasMessageContaining("Patient already has an appointment during the selected time");
 
 	verify(appointmentRepository, never()).save(any(Appointment.class));
     }
@@ -304,13 +342,16 @@ public class AppointmentServiceTest {
 	Appointment appointment = buildAppointment(10L);
 	AppointmentFilter filter = new AppointmentFilter();
 	Pageable pageable = PageRequest.of(0, 10);
-	when(appointmentRepository.findAll(any(org.springframework.data.jpa.domain.Specification.class), eq(pageable)))
+	when(appointmentPageableService.create(pageable)).thenReturn(pageable);
+	when(appointmentRepository.findAll(
+		org.mockito.ArgumentMatchers.<Specification<Appointment>>any(), eq(pageable)))
 		.thenReturn(new PageImpl<>(List.of(appointment), pageable, 1));
 
 	var response = appointmentService.getAppointments(filter, pageable);
 
 	assertThat(response.getTotalElements()).isEqualTo(1);
-	assertThat(response.getContent()).singleElement().extracting(AppointmentResponse::getId).isEqualTo(10L);
+	assertThat(response.getContent()).hasSize(1);
+	assertThat(response.getContent().get(0).getId()).isEqualTo(10L);
     }
 
     @Test
@@ -319,7 +360,9 @@ public class AppointmentServiceTest {
 
 	List<AppointmentResponse> responses = appointmentService.getAppointmentsList();
 
-	assertThat(responses).extracting(AppointmentResponse::getId).containsExactly(10L, 11L);
+	assertThat(responses).hasSize(2);
+	assertThat(responses.get(0).getId()).isEqualTo(10L);
+	assertThat(responses.get(1).getId()).isEqualTo(11L);
     }
 
     @Test
