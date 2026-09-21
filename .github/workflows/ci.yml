@@ -45,6 +45,10 @@ jobs:
                 cache: 'maven'
             
             - name: Build and Test
+              env:
+                TEST_DB_URL: jdbc:postgresql://localhost:5432/hams_test_db
+                TEST_DB_USERNAME: hams
+                TEST_DB_PASSWORD: hams123
               run: mvn clean verify
         
     frontend:
