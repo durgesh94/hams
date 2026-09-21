@@ -34,7 +34,7 @@ public class DashboardServiceTest {
 
 		when(dashboardRepository.countActiveDoctors()).thenReturn(12L);
 		when(dashboardRepository.countNewPatients(startDate, endDate)).thenReturn(34L);
-		when(dashboardRepository.countAppointments(startDate, endDate)).thenReturn(56L);
+		when(dashboardRepository.countAppointments(startDate.toLocalDate(), endDate.toLocalDate())).thenReturn(56L);
 
 		MonthlyDashboardResponse response = dashboardService.getMonthlyStatistics(month);
 
@@ -43,7 +43,7 @@ public class DashboardServiceTest {
 		assertThat(response.getNewPatientCount()).isEqualTo(34L);
 		assertThat(response.getAppointmentCount()).isEqualTo(56L);
 		verify(dashboardRepository).countNewPatients(startDate, endDate);
-		verify(dashboardRepository).countAppointments(startDate, endDate);
+		verify(dashboardRepository).countAppointments(startDate.toLocalDate(), endDate.toLocalDate());
 	}
 
 	@Test
@@ -54,7 +54,8 @@ public class DashboardServiceTest {
 
 		when(dashboardRepository.countActiveDoctors()).thenReturn(0L);
 		when(dashboardRepository.countNewPatients(eq(startDate), eq(endDate))).thenReturn(0L);
-		when(dashboardRepository.countAppointments(eq(startDate), eq(endDate))).thenReturn(0L);
+		when(dashboardRepository.countAppointments(eq(startDate.toLocalDate()), eq(endDate.toLocalDate())))
+				.thenReturn(0L);
 
 		MonthlyDashboardResponse response = dashboardService.getMonthlyStatistics(month);
 
