@@ -72,6 +72,13 @@ jobs:
                 name: Backend Test Report
                 path: api/target/surefire-reports/*.xml
                 reporter: java-junit
+
+            - name: Upload JaCoCo Coverage Report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                name: backend-jacoco-report
+                path: api/target/site/jacoco/
         
     frontend:
         name: Frontend CI
