@@ -48,6 +48,7 @@ ui/dist
 ui/dist-ssr
 ui/*.local
 ui/.env
+ui/coverage
 
 # Editor directories and files
 ui/.vscode/*
