@@ -59,6 +59,16 @@ jobs:
                     
             - name: Build and Test
               run: mvn clean verify
+
+            - name: Verify Sonar token
+              run: |
+                if [ -z "$SONAR_TOKEN" ]; then
+                echo "SONAR_TOKEN is missing"
+                exit 1
+                fi
+                echo "SONAR_TOKEN is configured"
+              env:
+                SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
             
             - name: SonarCloud analysis
               run: mvn sonar:sonar
