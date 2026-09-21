@@ -62,18 +62,18 @@ jobs:
 
             - name: Verify Sonar token
               run: |
-                if [ -z "$TOKEN" ]; then
-                echo "TOKEN is missing"
+                if [ -z "$SONAR_TOKEN" ]; then
+                echo "SONAR_TOKEN is missing"
                 exit 1
                 fi
-                echo "TOKEN is configured"
+                echo "SONAR_TOKEN is configured"
               env:
-                TOKEN: ${{ secrets.TOKEN }}
+                SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
             
             - name: SonarCloud analysis
               run: mvn sonar:sonar
               env:
-                TOKEN: ${{ secrets.TOKEN }}
+                SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         
     frontend:
         name: Frontend CI
