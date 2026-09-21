@@ -12,3 +12,7 @@ describe("Testing setup", () => {
     ).toBeInTheDocument();
   });
 });
+
+if (typeof SVGElement !== "undefined") {
+  SVGElement.prototype.focus = () => {};
+}

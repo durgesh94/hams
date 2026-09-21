@@ -16,7 +16,8 @@ interface ConfirmDialogProps {
   confirmText?: string;
   cancelText?: string;
   loading?: boolean;
-}
+  disableRestoreFocus?: boolean;
+  }
 
 const ConfirmDialog = ({
   open,
@@ -27,6 +28,7 @@ const ConfirmDialog = ({
   confirmText = "Confirm",
   cancelText = "Cancel",
   loading = false,
+  disableRestoreFocus = false,
 }: ConfirmDialogProps) => {
   return (
     <Dialog
@@ -34,6 +36,7 @@ const ConfirmDialog = ({
       onClose={loading ? undefined : onClose}
       maxWidth="xs"
       fullWidth
+      disableRestoreFocus={disableRestoreFocus}
     >
       <DialogTitle>{title}</DialogTitle>
 

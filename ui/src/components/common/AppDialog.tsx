@@ -16,6 +16,7 @@ interface AppDialogProps {
   submitText?: string;
   isSubmitting?: boolean;
   formId?: string;
+  disableRestoreFocus?: boolean;
 }
 
 const AppDialog = ({
@@ -27,11 +28,13 @@ const AppDialog = ({
   submitText = "Save",
   isSubmitting = false,
   formId,
+  disableRestoreFocus = false,
 }: AppDialogProps) => {
   return (
     <Dialog
       open={open}
       onClose={isSubmitting ? undefined : onClose}
+      disableRestoreFocus={disableRestoreFocus}
       fullWidth
       maxWidth="sm"
     >
