@@ -110,8 +110,8 @@ jobs:
             - name: Check code formatting
               run: pnpm format:check
 
-            - name: Run Tests
-              run: pnpm test
+            - name: Run Tests with Coverage
+              run: pnpm test:coverage
             
             - name: Build
               run: pnpm build
