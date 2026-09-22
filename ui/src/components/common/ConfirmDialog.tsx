@@ -17,7 +17,7 @@ interface ConfirmDialogProps {
   cancelText?: string;
   loading?: boolean;
   disableRestoreFocus?: boolean;
-  }
+}
 
 const ConfirmDialog = ({
   open,
