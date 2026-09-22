@@ -7,12 +7,23 @@ import AuthInitializer from "./AuthInitializer";
 import authReducer from "./authSlice";
 import { useGetCurrentUserQuery } from "./authApi";
 import { authStorage } from "./authStorage";
+import type { User } from "./types";
 
 vi.mock("./authApi", () => ({
   useGetCurrentUserQuery: vi.fn(),
 }));
 
 const mockedUseGetCurrentUserQuery = vi.mocked(useGetCurrentUserQuery);
+
+const mockCurrentUserQuery = (result: {
+  data?: User;
+  isLoading: boolean;
+  isError: boolean;
+}) => {
+  mockedUseGetCurrentUserQuery.mockReturnValue(
+    result as unknown as ReturnType<typeof useGetCurrentUserQuery>,
+  );
+};
 
 const currentUser = {
   username: "john.doe",
@@ -55,11 +66,11 @@ const renderInitializer = (
 describe("AuthInitializer", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockedUseGetCurrentUserQuery.mockReturnValue({
+    mockCurrentUserQuery({
       data: undefined,
       isLoading: false,
       isError: false,
-    } as ReturnType<typeof useGetCurrentUserQuery>);
+    });
     vi.spyOn(authStorage, "getTokenExpirationTime").mockReturnValue(null);
   });
 
@@ -73,11 +84,11 @@ describe("AuthInitializer", () => {
   });
 
   it("should render nothing while loading the current user for a token", () => {
-    mockedUseGetCurrentUserQuery.mockReturnValue({
+    mockCurrentUserQuery({
       data: undefined,
       isLoading: true,
       isError: false,
-    } as ReturnType<typeof useGetCurrentUserQuery>);
+    });
 
     renderInitializer("valid-token", null);
 
@@ -88,11 +99,11 @@ describe("AuthInitializer", () => {
   });
 
   it("should store the current user when the token is valid", () => {
-    mockedUseGetCurrentUserQuery.mockReturnValue({
+    mockCurrentUserQuery({
       data: currentUser,
       isLoading: false,
       isError: false,
-    } as ReturnType<typeof useGetCurrentUserQuery>);
+    });
 
     const { store } = renderInitializer("valid-token", null);
 
@@ -102,11 +113,11 @@ describe("AuthInitializer", () => {
   });
 
   it("should logout when current user loading fails", () => {
-    mockedUseGetCurrentUserQuery.mockReturnValue({
+    mockCurrentUserQuery({
       data: undefined,
       isLoading: false,
       isError: true,
-    } as ReturnType<typeof useGetCurrentUserQuery>);
+    });
 
     const { store } = renderInitializer("invalid-token", currentUser);
 
