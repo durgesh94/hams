@@ -89,14 +89,7 @@ public class DoctorController {
   public ResponseEntity<ApiResponse<Void>> deleteDoctor(@PathVariable Long id) {
     doctorService.deleteDoctor(id);
 
-    ApiResponse<Void> response =
-        ApiResponse.<Void>builder()
-            .status(HttpStatus.OK.value())
-            .message("Doctor deleted successfully.")
-            .data(null)
-            .timestamp(LocalDateTime.now())
-            .build();
-    return ResponseEntity.ok(response);
+    return ResponseEntity.noContent().build();
   }
 
   @GetMapping("/filter")

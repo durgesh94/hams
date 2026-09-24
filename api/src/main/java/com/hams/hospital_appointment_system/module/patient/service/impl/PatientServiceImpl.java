@@ -52,6 +52,12 @@ public class PatientServiceImpl implements PatientService {
             .findById(id)
             .orElseThrow(
                 () -> new ResourceNotFoundException("Patient with id '" + id + "' not found"));
+
+     if (patientRepository.existsByEmail(patientRequest.getEmail())) {
+      throw new DuplicateResourceException(
+          "Patient with email " + patientRequest.getEmail() + " already exists");
+    }
+    
     Patient updatedPatient = PatientMapper.updateEntity(patient, patientRequest);
     Patient savedPatient = patientRepository.save(updatedPatient);
     return PatientMapper.toDto(savedPatient);
