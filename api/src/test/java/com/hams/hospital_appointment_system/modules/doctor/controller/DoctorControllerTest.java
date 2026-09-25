@@ -166,8 +166,8 @@ class DoctorControllerTest {
 
     mockMvc
         .perform(delete("/api/v1/doctors/{id}", doctorId).with(csrf()))
-      .andExpect(status().isNoContent())
-      .andExpect(content().string(""));
+        .andExpect(status().isNoContent())
+        .andExpect(content().string(""));
 
     verify(doctorService).deleteDoctor(doctorId);
   }
