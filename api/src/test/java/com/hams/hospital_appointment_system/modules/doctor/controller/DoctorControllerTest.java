@@ -158,7 +158,7 @@ class DoctorControllerTest {
 
   @Test
   @WithMockUser
-  void deleteDoctor_shouldReturnOk() throws Exception {
+  void deleteDoctor_shouldReturnNoContent() throws Exception {
 
     Long doctorId = 1L;
 
@@ -166,9 +166,8 @@ class DoctorControllerTest {
 
     mockMvc
         .perform(delete("/api/v1/doctors/{id}", doctorId).with(csrf()))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.status").value(200))
-        .andExpect(jsonPath("$.message").value("Doctor deleted successfully."));
+      .andExpect(status().isNoContent())
+      .andExpect(content().string(""));
 
     verify(doctorService).deleteDoctor(doctorId);
   }
