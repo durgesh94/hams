@@ -9,13 +9,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.hams.auth.security.CustomUserDetailsService;
 
 import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -27,13 +31,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-
-        System.out.println(
-                "JWT FILTER: "
-                        + request.getMethod()
-                        + " "
-                        + request.getRequestURI()
-        );
 
         String authHeader = request.getHeader("Authorization");
 
@@ -78,16 +75,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder
                             .getContext()
                             .setAuthentication(authentication);
-
-                    System.out.println(
-                            "JWT AUTHENTICATED: " + username
+                    log.debug(
+                            "JWT authentication successful for user: {}",
+                            username
                     );
                 }
             }
 
         } catch (Exception exception) {
 
-            System.out.println(
+            log.warn(
                     "JWT VALIDATION FAILED: "
                             + exception.getMessage()
             );

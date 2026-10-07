@@ -24,8 +24,6 @@ public class AuthService {
     @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest request) {
 
-        System.out.println("AUTH LOGIN: " + request.username());
-
         Authentication authentication =
                 authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(
@@ -33,11 +31,6 @@ public class AuthService {
                                 request.password()
                         )
                 );
-
-        System.out.println(
-                "AUTHENTICATION SUCCESS: "
-                        + authentication.getName()
-        );
 
         User user = userRepository
                 .findByUsername(authentication.getName())
@@ -47,8 +40,6 @@ public class AuthService {
                 (org.springframework.security.core.userdetails.User)
                         authentication.getPrincipal()
         );
-
-        System.out.println("JWT GENERATED");
 
         UserResponse userResponse = new UserResponse(
                 user.getId(),
