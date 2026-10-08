@@ -41,4 +41,12 @@ public class AuthController {
         UserResponse userResponse = authService.createUser(request, "PATIENT");
         return ResponseEntity.ok(userResponse);
     }
+
+    @PostMapping("/register/doctor")
+    public ResponseEntity<UserResponse> registerDoctor(
+            @Valid @RequestBody RegisterRequest request
+    ){
+        UserResponse userResponse = authService.createUser(request, "DOCTOR");
+        return ResponseEntity.ok(userResponse);
+    }
 }

@@ -48,6 +48,21 @@ public class JwtService {
                 .compact();
     }
 
+    public String generateServiceToken(String serviceName) {
+
+        Date now = new Date();
+
+        return Jwts.builder()
+                .subject(serviceName)
+                .claim("type", "SERVICE")
+                .issuedAt(now)
+                .expiration(
+                        new Date(now.getTime() + jwtExpiration)
+                )
+                .signWith(signingKey)
+                .compact();
+    }
+
     public String extractUsername(String token) {
 
         return extractClaim(
@@ -97,5 +112,9 @@ public class JwtService {
                 .getPayload();
 
         return claimsResolver.apply(claims);
+    }
+
+    public long getExpiration() {
+        return jwtExpiration;
     }
 }
