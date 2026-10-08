@@ -2,6 +2,7 @@ package com.hams.auth.controller;
 
 import com.hams.auth.dto.LoginRequest;
 import com.hams.auth.dto.LoginResponse;
+import com.hams.auth.dto.RegisterRequest;
 import com.hams.auth.dto.UserResponse;
 import com.hams.auth.service.AuthService;
 import jakarta.validation.Valid;
@@ -30,6 +31,14 @@ public class AuthController {
             Authentication authentication
     ){
         UserResponse userResponse = authService.getCurrentUser(authentication.getName());
+        return ResponseEntity.ok(userResponse);
+    }
+
+    @PostMapping("/register/patient")
+    public ResponseEntity<UserResponse> register(
+            @Valid @RequestBody RegisterRequest request
+            ){
+        UserResponse userResponse = authService.createUser(request, "PATIENT");
         return ResponseEntity.ok(userResponse);
     }
 }
