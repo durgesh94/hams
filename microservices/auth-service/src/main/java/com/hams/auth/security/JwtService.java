@@ -117,4 +117,20 @@ public class JwtService {
     public long getExpiration() {
         return jwtExpiration;
     }
+
+    public String extractTokenType(String token) {
+        return extractClaim(token, claims -> claims.get("type", String.class));
+    }
+
+    public boolean isServiceTokenValid(String token) {
+        try {
+            String tokenType = extractTokenType(token);
+
+            return "SERVICE".equals(tokenType)
+                    && !isTokenExpired(token);
+
+        } catch (Exception exception) {
+            return false;
+        }
+    }
 }
