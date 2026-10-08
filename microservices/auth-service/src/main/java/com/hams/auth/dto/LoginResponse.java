@@ -1,5 +1,9 @@
-package main.java.com.hams.auth.dto;
+package com.hams.auth.dto;
 
-public class LoginResponse {
-    
+public record LoginResponse(
+        String accessToken,
+        String tokenType,
+        long expiresIn,
+        UserResponse user
+) {
 }

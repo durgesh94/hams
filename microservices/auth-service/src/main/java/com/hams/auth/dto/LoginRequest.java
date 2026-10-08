@@ -1,5 +1,14 @@
-package main.java.com.hams.auth.dto;
+package com.hams.auth.dto;
 
-public class LoginRequest {
-    
+import jakarta.validation.constraints.NotBlank;
+
+public record LoginRequest(
+
+        @NotBlank(message = "Username is required")
+        String username,
+
+        @NotBlank(message = "Password is required")
+        String password
+
+) {
 }

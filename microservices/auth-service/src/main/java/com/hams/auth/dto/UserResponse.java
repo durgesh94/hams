@@ -1,5 +1,10 @@
-package main.java.com.hams.auth.dto;
+package com.hams.auth.dto;
 
-public class UserResponse {
-    
+import java.util.UUID;
+
+public record UserResponse(
+        UUID id,
+        String username,
+        String role
+) {
 }
