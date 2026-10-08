@@ -2,6 +2,7 @@ package com.hams.auth.config;
 
 import com.hams.auth.entity.Role;
 import com.hams.auth.entity.User;
+import com.hams.auth.entity.UserStatus;
 import com.hams.auth.repository.RoleRepository;
 import com.hams.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +64,7 @@ public class DataInitializer implements CommandLineRunner {
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .role(role)
+                .status(UserStatus.ACTIVE)
                 .build();
 
         userRepository.save(user);

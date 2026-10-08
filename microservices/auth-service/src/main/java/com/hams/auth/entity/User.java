@@ -29,6 +29,10 @@ public class User {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserStatus status;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -40,6 +44,10 @@ public class User {
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;
+
+        if (status == null) {
+            status = UserStatus.ACTIVE;
+        }
     }
 
     @PreUpdate

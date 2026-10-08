@@ -1,8 +1,10 @@
 package com.hams.auth.security;
 
 import com.hams.auth.entity.User;
+import com.hams.auth.entity.UserStatus;
 import com.hams.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,6 +30,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                                 "User not found: " + username
                         )
                 );
+        if (user.getStatus() == UserStatus.INACTIVE) {
+            throw new DisabledException("User account is inactive");
+        }
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
