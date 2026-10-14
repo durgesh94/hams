@@ -22,17 +22,27 @@ public class JwtService {
 
     public JwtService(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") long jwtExpiration
-    ) {
+            @Value("${jwt.expiration}") long jwtExpiration) {
         this.signingKey = Keys.hmacShaKeyFor(
-                Decoders.BASE64.decode(secret)
-        );
+                Decoders.BASE64.decode(secret));
         this.jwtExpiration = jwtExpiration;
     }
 
     public String generateToken(UserDetails userDetails) {
 
         Map<String, Object> claims = new HashMap<>();
+
+        String role = userDetails.getAuthorities()
+                .stream()
+                .map(authority -> authority.getAuthority())
+                .map(authority -> authority.startsWith("ROLE_")
+                        ? authority.substring(5)
+                        : authority)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                        "User has no assigned role"));
+
+        claims.put("role", role);
 
         return Jwts.builder()
                 .claims(claims)
@@ -41,9 +51,7 @@ public class JwtService {
                 .expiration(
                         new Date(
                                 System.currentTimeMillis()
-                                        + jwtExpiration
-                        )
-                )
+                                        + jwtExpiration))
                 .signWith(signingKey)
                 .compact();
     }
@@ -57,8 +65,7 @@ public class JwtService {
                 .claim("type", "SERVICE")
                 .issuedAt(now)
                 .expiration(
-                        new Date(now.getTime() + jwtExpiration)
-                )
+                        new Date(now.getTime() + jwtExpiration))
                 .signWith(signingKey)
                 .compact();
     }
@@ -67,14 +74,12 @@ public class JwtService {
 
         return extractClaim(
                 token,
-                Claims::getSubject
-        );
+                Claims::getSubject);
     }
 
     public boolean isTokenValid(
             String token,
-            UserDetails userDetails
-    ) {
+            UserDetails userDetails) {
 
         String username = extractUsername(token);
 
@@ -96,14 +101,12 @@ public class JwtService {
 
         return extractClaim(
                 token,
-                Claims::getExpiration
-        );
+                Claims::getExpiration);
     }
 
     private <T> T extractClaim(
             String token,
-            Function<Claims, T> claimsResolver
-    ) {
+            Function<Claims, T> claimsResolver) {
 
         Claims claims = Jwts.parser()
                 .verifyWith(signingKey)

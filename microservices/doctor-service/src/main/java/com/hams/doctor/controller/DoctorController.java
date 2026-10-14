@@ -18,54 +18,43 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DoctorController {
 
-    private final DoctorService doctorService;
+        private final DoctorService doctorService;
 
-    @PostMapping
-    public ResponseEntity<DoctorResponse> createDoctor(
-            @Valid @RequestBody CreateDoctorRequest request
-    ) {
+        @PostMapping
+        public ResponseEntity<DoctorResponse> createDoctor(
+                        @Valid @RequestBody CreateDoctorRequest request) {
+                DoctorResponse response = doctorService.createDoctor(request);
+                return ResponseEntity
+                                .status(HttpStatus.CREATED)
+                                .body(response);
+        }
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(doctorService.createDoctor(request));
-    }
+        @GetMapping("/{id}")
+        public ResponseEntity<DoctorResponse> getDoctor(
+                        @PathVariable UUID id) {
+                DoctorResponse response = doctorService.getDoctor(id);
+                return ResponseEntity.ok(response);
+        }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DoctorResponse> getDoctor(
-            @PathVariable UUID id
-    ) {
+        @GetMapping("/user/{userId}")
+        public ResponseEntity<DoctorResponse> getDoctorByUserId(
+                        @PathVariable UUID userId) {
+                DoctorResponse response = doctorService.getDoctorByUserId(userId);
+                return ResponseEntity.ok(response);
+        }
 
-        return ResponseEntity.ok(
-                doctorService.getDoctor(id)
-        );
-    }
+        @GetMapping
+        public ResponseEntity<List<DoctorResponse>> getAllDoctors() {
+                List<DoctorResponse> response = doctorService.getAllDoctors();
+                return ResponseEntity.ok(response);
+        }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<DoctorResponse> getDoctorByUserId(
-            @PathVariable UUID userId
-    ) {
+        @PutMapping("/{id}")
+        public ResponseEntity<DoctorResponse> updateDoctor(
+                        @PathVariable UUID id,
+                        @Valid @RequestBody UpdateDoctorRequest request) {
 
-        return ResponseEntity.ok(
-                doctorService.getDoctorByUserId(userId)
-        );
-    }
-
-    @GetMapping
-    public ResponseEntity<List<DoctorResponse>> getAllDoctors() {
-
-        return ResponseEntity.ok(
-                doctorService.getAllDoctors()
-        );
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<DoctorResponse> updateDoctor(
-            @PathVariable UUID id,
-            @Valid @RequestBody UpdateDoctorRequest request
-    ) {
-
-        return ResponseEntity.ok(
-                doctorService.updateDoctor(id, request)
-        );
-    }
+                DoctorResponse response = doctorService.updateDoctor(id, request);
+                return ResponseEntity.ok(response);
+        }
 }
