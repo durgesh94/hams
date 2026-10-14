@@ -1,10 +1,13 @@
 package com.hams.doctor.controller;
 
 import com.hams.doctor.dto.CreateDoctorRequest;
+import com.hams.doctor.dto.CreateProfileRequest;
 import com.hams.doctor.dto.DoctorResponse;
 import com.hams.doctor.dto.UpdateDoctorRequest;
 import com.hams.doctor.service.DoctorService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,19 @@ public class DoctorController {
         public ResponseEntity<DoctorResponse> createDoctor(
                         @Valid @RequestBody CreateDoctorRequest request) {
                 DoctorResponse response = doctorService.createDoctor(request);
+                return ResponseEntity
+                                .status(HttpStatus.CREATED)
+                                .body(response);
+        }
+
+        @PostMapping("/me/profile")
+        public ResponseEntity<DoctorResponse> createProfile(
+                        @AuthenticationPrincipal Jwt jwt,
+                        @Valid @RequestBody CreateProfileRequest request) {
+
+                UUID userId = UUID.fromString(jwt.getSubject());
+                
+                DoctorResponse response = doctorService.createProfile(request, userId);
                 return ResponseEntity
                                 .status(HttpStatus.CREATED)
                                 .body(response);

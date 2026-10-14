@@ -1,6 +1,7 @@
 package com.hams.doctor.service;
 
 import com.hams.doctor.dto.CreateDoctorRequest;
+import com.hams.doctor.dto.CreateProfileRequest;
 import com.hams.doctor.dto.DoctorResponse;
 import com.hams.doctor.dto.UpdateDoctorRequest;
 import com.hams.doctor.entity.Doctor;
@@ -48,11 +49,31 @@ public class DoctorService {
                                 .phone(request.phone())
                                 .email(request.email())
                                 .address(request.address())
-                                .status(DoctorStatus.PROFILE_INCOMPLETE)
+                                .status(DoctorStatus.ACTIVE)
                                 .build();
                 // 3. Save the doctor profile in Doctor DB.
                 Doctor savedDoctor = doctorRepository.save(doctor);
 
+                return toResponse(savedDoctor);
+        }
+
+        @Transactional
+        public DoctorResponse createProfile(CreateProfileRequest request, UUID userId) {
+
+                Doctor doctor = Doctor.builder()
+                                .userId(userId)
+                                .firstName(request.firstName())
+                                .lastName(request.lastName())
+                                .specialization(request.specialization())
+                                .qualification(request.qualification())
+                                .experience(request.experience())
+                                .phone(request.phone())
+                                .email(request.email())
+                                .address(request.address())
+                                .status(DoctorStatus.PENDING_APPROVAL)
+                                .build();
+
+                Doctor savedDoctor = doctorRepository.save(doctor);
                 return toResponse(savedDoctor);
         }
 

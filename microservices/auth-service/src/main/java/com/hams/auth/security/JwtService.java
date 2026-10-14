@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.hams.auth.entity.User;
+
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,7 +30,7 @@ public class JwtService {
         this.jwtExpiration = jwtExpiration;
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, User user) {
 
         Map<String, Object> claims = new HashMap<>();
 
@@ -42,11 +44,12 @@ public class JwtService {
                 .orElseThrow(() -> new IllegalStateException(
                         "User has no assigned role"));
 
+        claims.put("username", userDetails.getUsername());
         claims.put("role", role);
 
         return Jwts.builder()
                 .claims(claims)
-                .subject(userDetails.getUsername())
+                .subject(user.getId().toString())
                 .issuedAt(new Date())
                 .expiration(
                         new Date(
@@ -71,10 +74,9 @@ public class JwtService {
     }
 
     public String extractUsername(String token) {
-
         return extractClaim(
                 token,
-                Claims::getSubject);
+                claims -> claims.get("username", String.class));
     }
 
     public boolean isTokenValid(

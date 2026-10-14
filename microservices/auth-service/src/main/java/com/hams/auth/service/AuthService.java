@@ -73,7 +73,8 @@ public class AuthService {
 
         String token = jwtService.generateToken(
                 (org.springframework.security.core.userdetails.User)
-                        authentication.getPrincipal()
+                        authentication.getPrincipal(),
+                        user
         );
 
         UserResponse userResponse = new UserResponse(
