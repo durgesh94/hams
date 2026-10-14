@@ -31,7 +31,7 @@ public class InternalTestController {
     public ResponseEntity<AuthUserResponse> createUser() {
 
         CreateUserRequest request = new CreateUserRequest(
-                "doctor",
+                "doctor.test",
                 "Doctor@123",
                 "DOCTOR"
         );

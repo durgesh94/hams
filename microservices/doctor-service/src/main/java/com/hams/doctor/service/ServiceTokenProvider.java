@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
 @Service
 @RequiredArgsConstructor
 public class ServiceTokenProvider {
@@ -20,17 +22,28 @@ public class ServiceTokenProvider {
     private String serviceSecret;
 
     private String accessToken;
+    private Instant tokenExpiresAt;
 
-    public String getToken() {
+    public synchronized String getToken() {
 
-        if (accessToken == null) {
-            accessToken = requestNewToken();
+        if (isTokenExpiredOrExpiringSoon()) {
+            requestNewToken();
         }
 
         return accessToken;
     }
 
-    private String requestNewToken() {
+    private boolean isTokenExpiredOrExpiringSoon() {
+
+        if (accessToken == null || tokenExpiresAt == null) {
+            return true;
+        }
+
+        return Instant.now()
+                .isAfter(tokenExpiresAt.minusSeconds(30));
+    }
+
+    private void requestNewToken() {
 
         ServiceTokenRequest request =
                 new ServiceTokenRequest(
@@ -41,6 +54,9 @@ public class ServiceTokenProvider {
         ServiceTokenResponse response =
                 serviceAuthClient.createToken(request);
 
-        return response.accessToken();
+        accessToken = response.accessToken();
+
+        tokenExpiresAt = Instant.now()
+                .plusMillis(response.expiresIn());
     }
 }

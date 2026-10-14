@@ -7,6 +7,10 @@ import com.hams.doctor.entity.Doctor;
 import com.hams.doctor.entity.DoctorStatus;
 import com.hams.doctor.repository.DoctorRepository;
 import lombok.RequiredArgsConstructor;
+import com.hams.doctor.client.AuthClient;
+import com.hams.doctor.client.dto.AuthUserResponse;
+import com.hams.doctor.client.dto.CreateUserRequest;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,111 +21,106 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DoctorService {
 
-    private final DoctorRepository doctorRepository;
+        private final DoctorRepository doctorRepository;
+        private final AuthClient authClient;
 
-    @Transactional
-    public DoctorResponse createDoctor(CreateDoctorRequest request) {
+        @Transactional
+        public DoctorResponse createDoctor(CreateDoctorRequest request) {
 
-        if (request.userId() != null
-                && doctorRepository.existsByUserId(request.userId())) {
+                // 1. Create the authentication account.
+                CreateUserRequest userRequest = new CreateUserRequest(
+                                request.username(),
+                                request.password(),
+                                "DOCTOR");
 
-            throw new IllegalArgumentException(
-                    "Doctor profile already exists for this user"
-            );
+                AuthUserResponse authUser = authClient.createUser(userRequest);
+
+                // 2. Use the user ID returned by Auth Service.
+                UUID userId = authUser.id();
+
+                Doctor doctor = Doctor.builder()
+                                .userId(userId)
+                                .firstName(request.firstName())
+                                .lastName(request.lastName())
+                                .specialization(request.specialization())
+                                .qualification(request.qualification())
+                                .experience(request.experience())
+                                .phone(request.phone())
+                                .email(request.email())
+                                .address(request.address())
+                                .status(DoctorStatus.PROFILE_INCOMPLETE)
+                                .build();
+                // 3. Save the doctor profile in Doctor DB.
+                Doctor savedDoctor = doctorRepository.save(doctor);
+
+                return toResponse(savedDoctor);
         }
 
-        Doctor doctor = Doctor.builder()
-                .userId(request.userId())
-                .firstName(request.firstName())
-                .lastName(request.lastName())
-                .specialization(request.specialization())
-                .qualification(request.qualification())
-                .experience(request.experience())
-                .phone(request.phone())
-                .email(request.email())
-                .address(request.address())
-                .status(DoctorStatus.PROFILE_INCOMPLETE)
-                .build();
+        @Transactional(readOnly = true)
+        public DoctorResponse getDoctor(UUID id) {
 
-        return toResponse(doctorRepository.save(doctor));
-    }
+                Doctor doctor = doctorRepository.findById(id)
+                                .orElseThrow(() -> new IllegalArgumentException(
+                                                "Doctor not found"));
 
-    @Transactional(readOnly = true)
-    public DoctorResponse getDoctor(UUID id) {
+                return toResponse(doctor);
+        }
 
-        Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Doctor not found"
-                        )
-                );
+        @Transactional(readOnly = true)
+        public DoctorResponse getDoctorByUserId(UUID userId) {
 
-        return toResponse(doctor);
-    }
+                Doctor doctor = doctorRepository.findByUserId(userId)
+                                .orElseThrow(() -> new IllegalArgumentException(
+                                                "Doctor profile not found"));
 
-    @Transactional(readOnly = true)
-    public DoctorResponse getDoctorByUserId(UUID userId) {
+                return toResponse(doctor);
+        }
 
-        Doctor doctor = doctorRepository.findByUserId(userId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Doctor profile not found"
-                        )
-                );
+        @Transactional(readOnly = true)
+        public List<DoctorResponse> getAllDoctors() {
 
-        return toResponse(doctor);
-    }
+                return doctorRepository.findAll()
+                                .stream()
+                                .map(this::toResponse)
+                                .toList();
+        }
 
-    @Transactional(readOnly = true)
-    public List<DoctorResponse> getAllDoctors() {
+        @Transactional
+        public DoctorResponse updateDoctor(
+                        UUID id,
+                        UpdateDoctorRequest request) {
 
-        return doctorRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
+                Doctor doctor = doctorRepository.findById(id)
+                                .orElseThrow(() -> new IllegalArgumentException(
+                                                "Doctor not found"));
 
-    @Transactional
-    public DoctorResponse updateDoctor(
-            UUID id,
-            UpdateDoctorRequest request
-    ) {
+                doctor.setFirstName(request.firstName());
+                doctor.setLastName(request.lastName());
+                doctor.setSpecialization(request.specialization());
+                doctor.setQualification(request.qualification());
+                doctor.setExperience(request.experience());
+                doctor.setPhone(request.phone());
+                doctor.setEmail(request.email());
+                doctor.setAddress(request.address());
 
-        Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Doctor not found"
-                        )
-                );
+                return toResponse(doctorRepository.save(doctor));
+        }
 
-        doctor.setFirstName(request.firstName());
-        doctor.setLastName(request.lastName());
-        doctor.setSpecialization(request.specialization());
-        doctor.setQualification(request.qualification());
-        doctor.setExperience(request.experience());
-        doctor.setPhone(request.phone());
-        doctor.setEmail(request.email());
-        doctor.setAddress(request.address());
+        private DoctorResponse toResponse(Doctor doctor) {
 
-        return toResponse(doctorRepository.save(doctor));
-    }
-
-    private DoctorResponse toResponse(Doctor doctor) {
-
-        return new DoctorResponse(
-                doctor.getId(),
-                doctor.getUserId(),
-                doctor.getFirstName(),
-                doctor.getLastName(),
-                doctor.getSpecialization(),
-                doctor.getQualification(),
-                doctor.getExperience(),
-                doctor.getPhone(),
-                doctor.getEmail(),
-                doctor.getAddress(),
-                doctor.getStatus(),
-                doctor.getCreatedAt(),
-                doctor.getUpdatedAt()
-        );
-    }
+                return new DoctorResponse(
+                                doctor.getId(),
+                                doctor.getUserId(),
+                                doctor.getFirstName(),
+                                doctor.getLastName(),
+                                doctor.getSpecialization(),
+                                doctor.getQualification(),
+                                doctor.getExperience(),
+                                doctor.getPhone(),
+                                doctor.getEmail(),
+                                doctor.getAddress(),
+                                doctor.getStatus(),
+                                doctor.getCreatedAt(),
+                                doctor.getUpdatedAt());
+        }
 }
