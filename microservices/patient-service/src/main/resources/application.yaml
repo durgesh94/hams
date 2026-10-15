@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: patient-service
+
+  datasource:
+    url: ${PATIENT_DB_URL:jdbc:postgresql://localhost:5432/hams_patient_db}
+    username: durgesh.tambe
+    password: 
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+server:
+  port: 8083
