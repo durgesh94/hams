@@ -6,60 +6,70 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.hams.auth.dto.ApiErrorResponse;
+
+import java.time.Instant;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RequiredRoleNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleRequiredRoleNotFoundException(
-            RequiredRoleNotFoundException exception
-    ) {
+        @ExceptionHandler(InvalidCredentialsException.class)
+        public ResponseEntity<Map<String, String>> handleInvalidCredentials(
+                        InvalidCredentialsException ex) {
+                return ResponseEntity
+                                .status(HttpStatus.UNAUTHORIZED)
+                                .body(Map.of("error", "Invalid credentials"));
+        }
 
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of(
-                        "error", exception.getMessage()
-                ));
-    }
+        @ExceptionHandler(RequiredRoleNotFoundException.class)
+        public ResponseEntity<Map<String, String>> handleRequiredRoleNotFoundException(
+                        RequiredRoleNotFoundException exception) {
 
-    @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<Map<String, String>> handleDuplicateResource(
-            DuplicateResourceException exception
-    ) {
+                return ResponseEntity
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(Map.of(
+                                                "error", exception.getMessage()));
+        }
 
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(Map.of(
-                        "error", exception.getMessage()
-                ));
-    }
+        @ExceptionHandler(DuplicateResourceException.class)
+        public ResponseEntity<ApiErrorResponse> handleDuplicateResource(
+                        DuplicateResourceException exception) {
 
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Map<String, String>> handleBadCredentials(
-            BadCredentialsException exception
-    ) {
+                HttpStatus status = HttpStatus.CONFLICT;
 
-        return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of(
-                        "error", "Invalid username or password"
-                ));
-    }
+                ApiErrorResponse body = new ApiErrorResponse(
+                                "USERNAME_ALREADY_EXISTS",
+                                "Username already exists",
+                                status.value(),
+                                Instant.now());
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleException(
-            Exception exception
-    ) {
+                return ResponseEntity
+                                .status(status)
+                                .body(body);
+        }
 
-        exception.printStackTrace();
+        @ExceptionHandler(BadCredentialsException.class)
+        public ResponseEntity<Map<String, String>> handleBadCredentials(
+                        BadCredentialsException exception) {
 
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of(
-                        "error", exception.getMessage() != null
-                                ? exception.getMessage()
-                                : "Internal server error"
-                ));
-    }
+                return ResponseEntity
+                                .status(HttpStatus.UNAUTHORIZED)
+                                .body(Map.of(
+                                                "error", "Invalid username or password"));
+        }
+
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<Map<String, String>> handleException(
+                        Exception exception) {
+
+                exception.printStackTrace();
+
+                return ResponseEntity
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(Map.of(
+                                                "error", exception.getMessage() != null
+                                                                ? exception.getMessage()
+                                                                : "Internal server error"));
+        }
 }

@@ -13,6 +13,9 @@ import com.hams.auth.repository.UserRepository;
 import com.hams.auth.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.UUID;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -73,7 +76,8 @@ public class AuthService {
 
         String token = jwtService.generateToken(
                 (org.springframework.security.core.userdetails.User)
-                        authentication.getPrincipal()
+                        authentication.getPrincipal(),
+                        user
         );
 
         UserResponse userResponse = new UserResponse(
@@ -102,5 +106,9 @@ public class AuthService {
                 user.getUsername(),
                 user.getRole().getName()
         );
+    }
+
+    public boolean existsById(UUID id) {
+        return userRepository.existsById(id);
     }
 }

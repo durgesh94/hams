@@ -36,3 +36,8 @@ management:
 jwt:
   secret: IXX22+lPaLesggLvoSDNysSNm9fAXVqn9oW+czKaWYA=
   expiration: 3600000
+
+services:
+  doctor:
+    name: doctor-service
+    secret: doctor-service-secret-12345-12345-12345-123

@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: doctor-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hams_doctor_db
+    username: durgesh.tambe
+    password: 
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8082
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
+
+services:
+  auth:
+    url: http://localhost:8081
+    name: doctor-service
+    secret: doctor-service-secret-12345-12345-12345-123
+
+jwt:
+  secret: IXX22+lPaLesggLvoSDNysSNm9fAXVqn9oW+czKaWYA=

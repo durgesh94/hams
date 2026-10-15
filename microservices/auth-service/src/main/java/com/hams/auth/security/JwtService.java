@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.hams.auth.entity.User;
+
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,44 +24,64 @@ public class JwtService {
 
     public JwtService(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") long jwtExpiration
-    ) {
+            @Value("${jwt.expiration}") long jwtExpiration) {
         this.signingKey = Keys.hmacShaKeyFor(
-                Decoders.BASE64.decode(secret)
-        );
+                Decoders.BASE64.decode(secret));
         this.jwtExpiration = jwtExpiration;
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, User user) {
 
         Map<String, Object> claims = new HashMap<>();
 
+        String role = userDetails.getAuthorities()
+                .stream()
+                .map(authority -> authority.getAuthority())
+                .map(authority -> authority.startsWith("ROLE_")
+                        ? authority.substring(5)
+                        : authority)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                        "User has no assigned role"));
+
+        claims.put("username", userDetails.getUsername());
+        claims.put("role", role);
+
         return Jwts.builder()
                 .claims(claims)
-                .subject(userDetails.getUsername())
+                .subject(user.getId().toString())
                 .issuedAt(new Date())
                 .expiration(
                         new Date(
                                 System.currentTimeMillis()
-                                        + jwtExpiration
-                        )
-                )
+                                        + jwtExpiration))
+                .signWith(signingKey)
+                .compact();
+    }
+
+    public String generateServiceToken(String serviceName) {
+
+        Date now = new Date();
+
+        return Jwts.builder()
+                .subject(serviceName)
+                .claim("type", "SERVICE")
+                .issuedAt(now)
+                .expiration(
+                        new Date(now.getTime() + jwtExpiration))
                 .signWith(signingKey)
                 .compact();
     }
 
     public String extractUsername(String token) {
-
         return extractClaim(
                 token,
-                Claims::getSubject
-        );
+                claims -> claims.get("username", String.class));
     }
 
     public boolean isTokenValid(
             String token,
-            UserDetails userDetails
-    ) {
+            UserDetails userDetails) {
 
         String username = extractUsername(token);
 
@@ -81,14 +103,12 @@ public class JwtService {
 
         return extractClaim(
                 token,
-                Claims::getExpiration
-        );
+                Claims::getExpiration);
     }
 
     private <T> T extractClaim(
             String token,
-            Function<Claims, T> claimsResolver
-    ) {
+            Function<Claims, T> claimsResolver) {
 
         Claims claims = Jwts.parser()
                 .verifyWith(signingKey)
@@ -97,5 +117,25 @@ public class JwtService {
                 .getPayload();
 
         return claimsResolver.apply(claims);
+    }
+
+    public long getExpiration() {
+        return jwtExpiration;
+    }
+
+    public String extractTokenType(String token) {
+        return extractClaim(token, claims -> claims.get("type", String.class));
+    }
+
+    public boolean isServiceTokenValid(String token) {
+        try {
+            String tokenType = extractTokenType(token);
+
+            return "SERVICE".equals(tokenType)
+                    && !isTokenExpired(token);
+
+        } catch (Exception exception) {
+            return false;
+        }
     }
 }
