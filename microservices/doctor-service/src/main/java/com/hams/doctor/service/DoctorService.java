@@ -6,6 +6,7 @@ import com.hams.doctor.dto.DoctorResponse;
 import com.hams.doctor.dto.UpdateDoctorRequest;
 import com.hams.doctor.entity.Doctor;
 import com.hams.doctor.entity.DoctorStatus;
+import com.hams.doctor.exception.DuplicateResourceException;
 import com.hams.doctor.repository.DoctorRepository;
 import lombok.RequiredArgsConstructor;
 import com.hams.doctor.client.AuthClient;
@@ -59,6 +60,13 @@ public class DoctorService {
 
         @Transactional
         public DoctorResponse createProfile(CreateProfileRequest request, UUID userId) {
+
+                // 1. Check the doctor profile does not already exist for this user.
+                if (doctorRepository.findByUserId(userId).isPresent()) {
+                        throw new DuplicateResourceException("Doctor profile already exists for this user");
+                }
+
+                // 2. Create the doctor profile with PENDING_APPROVAL status.
 
                 Doctor doctor = Doctor.builder()
                                 .userId(userId)
