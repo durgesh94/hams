@@ -77,4 +77,28 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleResourceNotFound(
+            ResourceNotFoundException exception) {
+        ApiErrorResponse response = new ApiErrorResponse(
+                "RESOURCE_NOT_FOUND",
+                exception.getMessage(),
+                HttpStatus.NOT_FOUND.value(),
+                Instant.now());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(InvalidDoctorReviewStateException.class)
+    public ResponseEntity<ApiErrorResponse> handleInvalidDoctorReviewState(
+            InvalidDoctorReviewStateException exception) {
+        ApiErrorResponse response = new ApiErrorResponse(
+                "INVALID_DOCTOR_REVIEW_STATE",
+                exception.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                Instant.now());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
 }

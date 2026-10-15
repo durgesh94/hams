@@ -20,52 +20,52 @@ import java.util.Base64;
 @Configuration
 public class SecurityConfig {
 
-    @Bean
-    public JwtDecoder jwtDecoder(
-            @Value("${jwt.secret}") String secret) {
+        @Bean
+        public JwtDecoder jwtDecoder(
+                        @Value("${jwt.secret}") String secret) {
 
-        byte[] keyBytes = Base64.getDecoder().decode(secret);
+                byte[] keyBytes = Base64.getDecoder().decode(secret);
 
-        SecretKey key = new SecretKeySpec(
-                keyBytes,
-                "HmacSHA256");
+                SecretKey key = new SecretKeySpec(
+                                keyBytes,
+                                "HmacSHA256");
 
-        return NimbusJwtDecoder.withSecretKey(key)
-                .macAlgorithm(MacAlgorithm.HS256)
-                .build();
-    }
+                return NimbusJwtDecoder.withSecretKey(key)
+                                .macAlgorithm(MacAlgorithm.HS256)
+                                .build();
+        }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http,
-            JsonAuthenticationEntryPoint authenticationEntryPoint,
-            JsonAccessDeniedHandler accessDeniedHandler) throws Exception {
+        @Bean
+        public SecurityFilterChain securityFilterChain(
+                        HttpSecurity http,
+                        JsonAuthenticationEntryPoint authenticationEntryPoint,
+                        JsonAccessDeniedHandler accessDeniedHandler) throws Exception {
 
-        http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/actuator/**")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/doctors")
-                        .hasRole("ADMIN")
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/v1/doctors/user/**")
-                        .hasAnyRole("ADMIN", "DOCTOR")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/doctors/**")
-                        .hasAnyRole("ADMIN", "DOCTOR")
-                        .requestMatchers("/api/v1/doctors/**")
-                        .authenticated()
-                        .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .authenticationEntryPoint(authenticationEntryPoint)
-                        .accessDeniedHandler(accessDeniedHandler)
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(
-                                new JwtRoleConverter())));
+                http
+                                .csrf(csrf -> csrf.disable())
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/actuator/**")
+                                                .permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/v1/doctors")
+                                                .hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/doctors")
+                                                .hasRole("ADMIN")
+                                                .requestMatchers(HttpMethod.POST, "/api/v1/doctors/me/profile")
+                                                .hasRole("DOCTOR")
+                                                .requestMatchers(HttpMethod.PUT, "/api/v1/doctors/**")
+                                                .hasAnyRole("ADMIN", "DOCTOR")
+                                                .requestMatchers(HttpMethod.PATCH, "/api/v1/doctors/*/review")
+                                                .hasRole("ADMIN")
+                                                .anyRequest()
+                                                .authenticated())
+                                .oauth2ResourceServer(oauth2 -> oauth2
+                                                .authenticationEntryPoint(authenticationEntryPoint)
+                                                .accessDeniedHandler(accessDeniedHandler)
+                                                .jwt(jwt -> jwt.jwtAuthenticationConverter(
+                                                                new JwtRoleConverter())));
 
-        return http.build();
-    }
+                return http.build();
+        }
 }

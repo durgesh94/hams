@@ -3,10 +3,13 @@ package com.hams.doctor.service;
 import com.hams.doctor.dto.CreateDoctorRequest;
 import com.hams.doctor.dto.CreateProfileRequest;
 import com.hams.doctor.dto.DoctorResponse;
+import com.hams.doctor.dto.DoctorReviewRequest;
 import com.hams.doctor.dto.UpdateDoctorRequest;
 import com.hams.doctor.entity.Doctor;
 import com.hams.doctor.entity.DoctorStatus;
 import com.hams.doctor.exception.DuplicateResourceException;
+import com.hams.doctor.exception.InvalidDoctorReviewStateException;
+import com.hams.doctor.exception.ResourceNotFoundException;
 import com.hams.doctor.repository.DoctorRepository;
 import lombok.RequiredArgsConstructor;
 import com.hams.doctor.client.AuthClient;
@@ -133,6 +136,33 @@ public class DoctorService {
                 doctor.setAddress(request.address());
 
                 return toResponse(doctorRepository.save(doctor));
+        }
+
+        @Transactional
+        public DoctorResponse reviewDoctor(
+                        UUID doctorId,
+                        DoctorReviewRequest request) {
+
+                Doctor doctor = doctorRepository.findById(doctorId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Doctor profile not found: " + doctorId));
+
+                if (doctor.getStatus() != DoctorStatus.PENDING_APPROVAL) {
+                        throw new InvalidDoctorReviewStateException(
+                                        "Only pending doctor profiles can be reviewed");
+                }
+
+                DoctorStatus newStatus = switch (request.decision()) {
+                        case APPROVED -> DoctorStatus.ACTIVE;
+                        case REJECTED -> DoctorStatus.REJECTED;
+                };
+
+                doctor.setStatus(newStatus);
+                // doctor.setReviewRemarks(request.remarks());
+
+                Doctor savedDoctor = doctorRepository.save(doctor);
+
+                return toResponse(savedDoctor);
         }
 
         private DoctorResponse toResponse(Doctor doctor) {

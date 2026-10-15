@@ -3,6 +3,7 @@ package com.hams.doctor.controller;
 import com.hams.doctor.dto.CreateDoctorRequest;
 import com.hams.doctor.dto.CreateProfileRequest;
 import com.hams.doctor.dto.DoctorResponse;
+import com.hams.doctor.dto.DoctorReviewRequest;
 import com.hams.doctor.dto.UpdateDoctorRequest;
 import com.hams.doctor.service.DoctorService;
 import jakarta.validation.Valid;
@@ -38,7 +39,7 @@ public class DoctorController {
                         @Valid @RequestBody CreateProfileRequest request) {
 
                 UUID userId = UUID.fromString(jwt.getSubject());
-                
+
                 DoctorResponse response = doctorService.createProfile(request, userId);
                 return ResponseEntity
                                 .status(HttpStatus.CREATED)
@@ -71,6 +72,16 @@ public class DoctorController {
                         @Valid @RequestBody UpdateDoctorRequest request) {
 
                 DoctorResponse response = doctorService.updateDoctor(id, request);
+                return ResponseEntity.ok(response);
+        }
+
+        @PatchMapping("/{doctorId}/review")
+        public ResponseEntity<DoctorResponse> reviewDoctor(
+                        @PathVariable UUID doctorId,
+                        @Valid @RequestBody DoctorReviewRequest request) {
+
+                DoctorResponse response = doctorService.reviewDoctor(doctorId, request);
+
                 return ResponseEntity.ok(response);
         }
 }
