@@ -65,3 +65,11 @@ ui/*.sw?
 .DS_Store
 _notes/.DS_Store
 _notes/screenshots/.DS_Store
+
+# microservices
+microservices/doctor-service/HELP.md
+microservices/doctor-service/.idea
+microservices/doctor-service/target/
+microservices/doctor-service/.mvn/wrapper/maven-wrapper.jar
+!microservices/doctor-service/**/src/main/**/target/
+!microservices/doctor-service/**/src/test/**/target/
